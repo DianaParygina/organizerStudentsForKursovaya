@@ -15,7 +15,7 @@ public class Main {
         try {
             DBConnector.createDB();
             DBConnector.getAllItem();
-            DBConnector.getAllTask();
+//            DBConnector.getAllTask();
 //            DBConnector.getAllFederation();
         } catch (SQLException e) {
             e.printStackTrace();

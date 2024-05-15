@@ -55,16 +55,23 @@ public class DBConnector {
         return list;
     }
 
-    public static List<Task> getAllTask() throws SQLException {
-        Statement statement = conn.createStatement();
-        List<Task> list = new ArrayList<Task>();
-        ResultSet resultSet = statement.executeQuery("SELECT id, type, target, due_date, done FROM tasks");
-        while (resultSet.next()) {
-            list.add(new Task(resultSet.getInt("id"),resultSet.getString("type"), resultSet.getString("target"), resultSet.getString("due_date"), resultSet.getBoolean("done")));
+    public static List<Task> getTasksForItem(int itemId) throws SQLException {
+        List<Task> tasks = new ArrayList<>();
+        String sql = "SELECT * FROM tasks WHERE item_id = ?";
+        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, itemId);
+            ResultSet rs = pstmt.executeQuery();
+            while (rs.next()) {
+                int id = rs.getInt("id");
+                String type = rs.getString("type");
+                String target = rs.getString("target");
+                String due_date = rs.getString("due_date");
+                boolean done = rs.getBoolean("done");
+                Task task = new Task(id, type, target, due_date, done);
+                tasks.add(task);
+            }
         }
-        resultSet.close();
-        statement.close();
-        return list;
+        return tasks;
     }
 
 //    public static String searchStateByIdRepublic(int id, String type) {

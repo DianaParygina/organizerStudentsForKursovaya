@@ -1,7 +1,5 @@
 package org.example;
-
 import db.DBConnector;
-
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.WindowAdapter;
@@ -9,14 +7,16 @@ import java.awt.event.WindowEvent;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-
 public class SecondWindow extends JFrame {
     AddTask tasks = new AddTask();
-    List<Task> tasksList = new ArrayList<>(); // Инициализация tasksList
+    List tasksList = new ArrayList<>(); // Инициализация tasksList
     MyTableModelSpecificsTask tableModelTask;
     JTable taskTable;
+    private int itemId; // Добавленное поле для идентификатора предмета
 
     public SecondWindow(Item selectedItem) {
+        this.itemId = selectedItem.getId(); // Сохраняем идентификатор предмета
+
         setTitle("Информация о предмете");
         setSize(500, 300);
         setLocationRelativeTo(null);
@@ -53,7 +53,7 @@ public class SecondWindow extends JFrame {
         // Получение данных из базы данных
         try {
             DBConnector.connection();
-            tasksList = DBConnector.getAllTask();
+            tasksList = DBConnector.getTasksForItem(itemId); // Получение задач для текущего предмета
             DBConnector.createDB();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -61,7 +61,7 @@ public class SecondWindow extends JFrame {
         } finally {
             DBConnector.closeConnection();
         }
-
+        updateTable();
         setResizable(false);
         setVisible(true);
     }
@@ -89,7 +89,7 @@ public class SecondWindow extends JFrame {
     public void updateTable() {
         try {
             DBConnector.connection();
-            tasksList = DBConnector.getAllTask(); // Обновление списка задач
+            tasksList = DBConnector.getTasksForItem(itemId); // Обновление списка задач для текущего предмета
             tableModelTask.setTasks(tasksList); // Обновление модели таблицы
             taskTable.repaint(); // Перерисовка таблицы
         } catch (SQLException e) {
