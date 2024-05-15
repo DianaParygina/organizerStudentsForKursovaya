@@ -11,9 +11,10 @@ import java.util.List;
 public class ThirdWindow extends JDialog {
 
     AddTask tasks = new AddTask();
-    List<Task> tasksList;
+    SecondWindow secondWindow;
 
     public ThirdWindow(SecondWindow secondWindow, AddTask tasks, Item selectedItem) {
+        this.secondWindow = secondWindow;
         setTitle("Добавить работу");
         setSize(400, 200);
         setLocationRelativeTo(null);
@@ -24,7 +25,7 @@ public class ThirdWindow extends JDialog {
         p1.setLayout(new GridLayout(3, 2));
         JPanel p2 = new JPanel();
         p2.setLayout(layout);
-        Button specificsButton = new Button("Хотите внести работу?");
+        Button specificsButton = new Button("Добавить работу");
         // данные из selectedItem для заполнения второй формы
         JLabel nameLabel = new JLabel("Название: " + selectedItem.getName());
         JLabel hoursLabel = new JLabel("Часов: " + selectedItem.getNumberOfHours());
@@ -45,8 +46,6 @@ public class ThirdWindow extends JDialog {
             String typeTask = typeTaskField.getText();
             String targetTask = targetTaskField.getText();
             String due_dateTask = due_dateTaskField.getText();
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd"); // Укажи формат даты
-            LocalDate dueDate = LocalDate.parse(due_dateTask, formatter);
             String doneTask = doneTaskField.getText();
             boolean isDone = Boolean.parseBoolean(doneTask);
 
@@ -63,7 +62,7 @@ public class ThirdWindow extends JDialog {
 //                return;
 //            }
 
-            tasks.AddTasks(typeTask, targetTask, dueDate, isDone);
+            tasks.AddTasks(typeTask, targetTask, due_dateTask, isDone, selectedItem.getId());
 
             typeTaskField.setText("");
             targetTaskField.setText("");
@@ -71,6 +70,7 @@ public class ThirdWindow extends JDialog {
             doneTaskField.setText("");
 
             dispose();
+            secondWindow.updateTable();
 
         });
 

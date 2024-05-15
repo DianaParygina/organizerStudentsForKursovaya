@@ -40,7 +40,7 @@ public class DBConnector {
     public static void createDB() throws SQLException {
         Statement statmt = conn.createStatement();
         statmt.execute("CREATE TABLE if not exists 'item' ('id' INTEGER PRIMARY KEY AUTOINCREMENT, 'name' text, 'number_of_hours' integer);");
-        statmt.execute("CREATE TABLE if not exists 'tasks' ('id' INTEGER PRIMARY KEY AUTOINCREMENT, 'type' text, 'target' text, 'due_date' LocalDate, 'done' boolean, 'item_id' INTEGER, FOREIGN KEY (item_id) REFERENCES item (id));");
+        statmt.execute("CREATE TABLE if not exists 'tasks' ('id' INTEGER PRIMARY KEY AUTOINCREMENT, 'type' text, 'target' text, 'due_date' string, 'done' boolean, 'item_id' INTEGER, FOREIGN KEY (item_id) REFERENCES item (id));");
     }
 
     public static List<Item> getAllItem() throws SQLException {
@@ -60,7 +60,7 @@ public class DBConnector {
         List<Task> list = new ArrayList<Task>();
         ResultSet resultSet = statement.executeQuery("SELECT id, type, target, due_date, done FROM tasks");
         while (resultSet.next()) {
-            list.add(new Task(resultSet.getInt("id"),resultSet.getString("type"), resultSet.getString("target"), resultSet.getDate(String.valueOf(Date.valueOf("due_date"))).toLocalDate(), resultSet.getBoolean("done")));
+            list.add(new Task(resultSet.getInt("id"),resultSet.getString("type"), resultSet.getString("target"), resultSet.getString("due_date"), resultSet.getBoolean("done")));
         }
         resultSet.close();
         statement.close();

@@ -1,35 +1,37 @@
 package org.example;
 
-import javax.swing.*;
-import java.sql.*;
-import java.time.LocalDate;
+import db.DBConnector;
 
-import static db.DBConnector.conn;
+import javax.swing.*;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 
 public class AddTask {
 
-    public void AddTasks(String type, String target, LocalDate due_date, boolean done) {
-        String SQL = "INSERT INTO tasks(type, target, due_date, done) VALUES(?,?,?,?)";
+    public void AddTasks(String type, String target, String due_date, boolean done, int itemId) {
+        try {
+            DBConnector.connection();
+            DBConnector.createDB();
+            String sql = "INSERT INTO tasks(type, target, due_date, done, item_id) VALUES(?, ?, ?, ?, ?)";
+            try (PreparedStatement pstmt = DBConnector.conn.prepareStatement(sql)) {
+                pstmt.setString(1, type);
+                pstmt.setString(2, target);
+                pstmt.setString(3, due_date);
+                pstmt.setBoolean(4, done);
+                pstmt.setInt(5, itemId);
 
-        try (PreparedStatement pstmt = conn.prepareStatement(SQL, Statement.RETURN_GENERATED_KEYS)) {
-            pstmt.setString(1, type);
-            pstmt.setString(2, target);
-            pstmt.setDate(1, Date.valueOf(due_date));
-            pstmt.setBoolean(2, done);
-
-            int affectedRows = pstmt.executeUpdate();
-            if (affectedRows > 0) {
-                try (ResultSet generatedKeys = pstmt.getGeneratedKeys()) {
-                    if (generatedKeys.next()) {
-                        int id = generatedKeys.getInt(1);
-                        // Пример использования сгенерированного id
-                    }
+                int affectedRows = pstmt.executeUpdate();
+                if (affectedRows > 0) {
+                    JOptionPane.showMessageDialog(null, "Задача добавлена");
+                } else {
+                    JOptionPane.showMessageDialog(null, "Ошибка добавления задачи");
                 }
             }
-            JOptionPane.showMessageDialog(null, "Работа успешно добавлена.");
-        } catch (SQLException ex) {
-            System.out.println(ex.getMessage());
+        } catch (SQLException e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(null, "Ошибка подключения к БД");
+        } finally {
+            DBConnector.closeConnection();
         }
     }
-
 }

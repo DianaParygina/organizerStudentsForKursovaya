@@ -7,11 +7,14 @@ import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 public class SecondWindow extends JFrame {
     AddTask tasks = new AddTask();
-    List<Task> tasksList;
+    List<Task> tasksList = new ArrayList<>(); // Инициализация tasksList
+    MyTableModelSpecificsTask tableModelTask;
+    JTable taskTable;
 
     public SecondWindow(Item selectedItem) {
         setTitle("Информация о предмете");
@@ -25,7 +28,7 @@ public class SecondWindow extends JFrame {
 
         JLabel nameLabel = new JLabel("Название: " + selectedItem.getName());
         JLabel hoursLabel = new JLabel("Часов: " + selectedItem.getNumberOfHours());
-        JButton specificsButton = new JButton("Добавить работу");
+        Button specificsButton = new Button("Добавить работу");
         //specificsButton.setPreferredSize(new Dimension(150, 25)); // Задаем размер кнопки
         topPanel.add(nameLabel);
         topPanel.add(hoursLabel);
@@ -34,6 +37,11 @@ public class SecondWindow extends JFrame {
         add(topPanel, BorderLayout.NORTH);
 
         specificsButton.addActionListener(e -> ThirdWindow(selectedItem));
+
+        // Таблица с работами по предмету
+        tableModelTask = new MyTableModelSpecificsTask(tasksList); // Инициализация tableModelTask
+        taskTable = new JTable(tableModelTask);
+        addSectionWithLabelAndTable("Работы по предмету", taskTable);
 
         // Обработчик закрытия окна
         addWindowListener(new WindowAdapter() {
@@ -53,11 +61,6 @@ public class SecondWindow extends JFrame {
         } finally {
             DBConnector.closeConnection();
         }
-
-        // Таблица с работами по предмету
-        MyTableModelSpecificsTask tableModelTask = new MyTableModelSpecificsTask(tasksList);
-        JTable taskTable = new JTable(tableModelTask);
-        addSectionWithLabelAndTable("Работы по предмету", taskTable);
 
         setResizable(false);
         setVisible(true);
@@ -81,5 +84,19 @@ public class SecondWindow extends JFrame {
 
     private void ThirdWindow(Item selectedItem) {
         new ThirdWindow(this, tasks, selectedItem);
+    }
+
+    public void updateTable() {
+        try {
+            DBConnector.connection();
+            tasksList = DBConnector.getAllTask(); // Обновление списка задач
+            tableModelTask.setTasks(tasksList); // Обновление модели таблицы
+            taskTable.repaint(); // Перерисовка таблицы
+        } catch (SQLException e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Ошибка при обновлении таблицы", "Ошибка", JOptionPane.ERROR_MESSAGE);
+        } finally {
+            DBConnector.closeConnection();
+        }
     }
 }

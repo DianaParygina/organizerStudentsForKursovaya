@@ -8,10 +8,10 @@ public class Task {
     private int id;
     private String type;
     private String target;
-    private LocalDate due_date;
+    private String due_date;
     private boolean done;
 
-    public Task(int id, String type, String target, LocalDate due_date, boolean done) {
+    public Task(int id, String type, String target, String due_date, boolean done) {
         this.id = id;
         this.type = type;
         this.target = target;
@@ -44,11 +44,11 @@ public class Task {
         this.target = target;
     }
 
-    public LocalDate getDueDate() {
+    public String getDueDate() {
         return due_date;
     }
 
-    public void setDueDate(LocalDate due_date) {
+    public void setDueDate(String due_date) {
         this.due_date = due_date;
     }
 

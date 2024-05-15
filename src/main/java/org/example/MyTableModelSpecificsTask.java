@@ -46,4 +46,9 @@ public class MyTableModelSpecificsTask extends AbstractTableModel {
         };
     }
 
+    public void setTasks(List<Task> tasks) {
+        this.data = tasks;
+        fireTableDataChanged(); // Сообщает таблице о изменении данных
+    }
+
 }
