@@ -7,11 +7,14 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.sql.*;
+import java.util.List;
 
 public class SpecialtySelectionCourseGeologySpecialtyOneCourseWindow extends JFrame {
 
     private final JTable specialtyGeologyTable;
     private final DefaultTableModel specialtyGeologyTableModel;
+    AddItem item = new AddItem();
+    List<Item> items;
 
     public SpecialtySelectionCourseGeologySpecialtyOneCourseWindow(String title) {
         specialtyGeologyTableModel = new DefaultTableModel(new Object[]{"ID", "nameCourse"}, 0);
@@ -36,11 +39,9 @@ public class SpecialtySelectionCourseGeologySpecialtyOneCourseWindow extends JFr
                     int selectedRow = specialtyGeologyTable.getSelectedRow();
                     if (selectedRow != -1) {
                         int specialtyId = (int) specialtyGeologyTableModel.getValueAt(selectedRow, 0);
-//                        if (specialtyId == 1) {
-//                            new SpecialtySelectionCourseGeologySpecialtyOneCourseWindow("1 курс").setVisible(true);
-//                        } else if (specialtyId == 2) {
-//                            new SpecialtySelectionCourseGeologySpecialtyTwoCourseWindow("2 курс").setVisible(true);
-//                        }
+                        Item selectedItem = items.get(selectedRow);
+                        SecondWindow secondWindow = new SecondWindow(selectedItem);
+                        secondWindow.setVisible(true);
                     }
                 }
             }
@@ -49,7 +50,7 @@ public class SpecialtySelectionCourseGeologySpecialtyOneCourseWindow extends JFr
 
     private void loadCourseGeologyFromDatabase() {
         try (Connection connection = DBConnector.connection();
-             PreparedStatement preparedStatement = connection.prepareStatement("SELECT id, nameCourse FROM specialtyCourse WHERE idnameIndustry = ?")) {
+             PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM ПервыйКурсСпециалитетГеологи WHERE idFirstCourse = ?")) {
 
             preparedStatement.setInt(1, 1); // 1 -  idNameIndustry для 1 курса
             ResultSet resultSet = preparedStatement.executeQuery();
