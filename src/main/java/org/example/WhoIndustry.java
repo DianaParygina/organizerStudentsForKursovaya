@@ -19,7 +19,7 @@ public class WhoIndustry extends JFrame {
         add(scrollPane);
         setTitle("Список отраслей");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(400, 300);
+        setSize(400, 150);
         setLocationRelativeTo(null);
         setVisible(true);
 

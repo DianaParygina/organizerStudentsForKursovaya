@@ -19,13 +19,16 @@ public class SpecialtySelectionSystemGeologyWindow extends JFrame {
         JScrollPane scrollPane = new JScrollPane(specialtyGeologyTable);
         add(scrollPane);
         setTitle(title);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        //setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(400, 300);
         setLocationRelativeTo(null);
         setVisible(true);
 
         // Загрузка специальностей из БД
         loadCourseGeologyFromDatabase();
+
+        specialtyGeologyTable.setCellSelectionEnabled(false);
+        specialtyGeologyTable.setDefaultEditor(Object.class, null);
 
         specialtyGeologyTable.addMouseListener(new MouseAdapter() {
             @Override
