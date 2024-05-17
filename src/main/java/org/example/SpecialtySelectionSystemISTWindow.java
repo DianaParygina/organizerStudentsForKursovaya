@@ -43,7 +43,7 @@ public class SpecialtySelectionSystemISTWindow extends JFrame  {
                         if (selectedRow != -1) {
                             int specialtyId = (int) specialtyISTTable.getValueAt(selectedRow, 0);
                             if (specialtyId == 1) {
-                                new SpecialtySelectionCourseGeologyWindow("Специалитет").setVisible(true);
+                                //new SpecialtySelectionCourseGeologyWindow("Специалитет").setVisible(true);
                             } else if (specialtyId == 2) {
                                 //new SpecialtySelectionCourseISTWindow("Бакалавриат").setVisible(true);
                             }
