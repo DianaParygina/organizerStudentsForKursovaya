@@ -8,15 +8,15 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.sql.*;
 
-public class SpecialtySelectionCourseGeologySpecialtyOneCourseWindow extends JFrame {
+public class SpecialtySelectionCourseGeologyBachelorOneCourseWindow extends JFrame {
 
-    private final JTable specialtyGeologyTable;
-    private final DefaultTableModel specialtyGeologyTableModel;
+    private final JTable bachelorGeologyTable;
+    private final DefaultTableModel bachelorGeologyTableModel;
 
-    public SpecialtySelectionCourseGeologySpecialtyOneCourseWindow(String title) {
-        specialtyGeologyTableModel = new DefaultTableModel(new Object[]{"ID", "nameCourse"}, 0);
-        specialtyGeologyTable = new JTable(specialtyGeologyTableModel);
-        JScrollPane scrollPane = new JScrollPane(specialtyGeologyTable);
+    public SpecialtySelectionCourseGeologyBachelorOneCourseWindow(String title) {
+        bachelorGeologyTableModel = new DefaultTableModel(new Object[]{"ID", "nameCourse"}, 0);
+        bachelorGeologyTable = new JTable(bachelorGeologyTableModel);
+        JScrollPane scrollPane = new JScrollPane(bachelorGeologyTable);
         add(scrollPane);
         setTitle(title);
         setSize(400, 300);
@@ -26,21 +26,21 @@ public class SpecialtySelectionCourseGeologySpecialtyOneCourseWindow extends JFr
         // Загрузка специальностей из БД
         loadCourseGeologyFromDatabase();
 
-        specialtyGeologyTable.setCellSelectionEnabled(false);
-        specialtyGeologyTable.setDefaultEditor(Object.class, null);
+        bachelorGeologyTable.setCellSelectionEnabled(false);
+        bachelorGeologyTable.setDefaultEditor(Object.class, null);
 
-        specialtyGeologyTable.addMouseListener(new MouseAdapter() {
+        bachelorGeologyTable.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
                 if (e.getClickCount() == 2) { // getClickCount() -  верный метод для определения двойного клика
-                    int selectedRow = specialtyGeologyTable.getSelectedRow();
+                    int selectedRow = bachelorGeologyTable.getSelectedRow();
                     if (selectedRow != -1) {
-                        int specialtyId = (int) specialtyGeologyTableModel.getValueAt(selectedRow, 0);
-//                        if (specialtyId == 1) {
-//                            new SpecialtySelectionCourseGeologySpecialtyOneCourseWindow("1 курс").setVisible(true);
-//                        } else if (specialtyId == 2) {
-//                            new SpecialtySelectionCourseGeologySpecialtyTwoCourseWindow("2 курс").setVisible(true);
-//                        }
+                        int specialtyId = (int) bachelorGeologyTableModel.getValueAt(selectedRow, 0);
+                        if (specialtyId == 1) {
+                            new SpecialtySelectionCourseGeologySpecialtyOneCourseWindow("1 курс").setVisible(true);
+                        } else if (specialtyId == 2) {
+                            new SpecialtySelectionCourseGeologySpecialtyTwoCourseWindow("2 курс").setVisible(true);
+                        }
                     }
                 }
             }
@@ -51,12 +51,12 @@ public class SpecialtySelectionCourseGeologySpecialtyOneCourseWindow extends JFr
         try (Connection connection = DBConnector.connection();
              PreparedStatement preparedStatement = connection.prepareStatement("SELECT id, nameCourse FROM specialtyCourse WHERE idnameIndustry = ?")) {
 
-            preparedStatement.setInt(1, 1); // 1 -  idNameIndustry для 1 курса
+            preparedStatement.setInt(1, 1);
             ResultSet resultSet = preparedStatement.executeQuery();
             while (resultSet.next()) {
                 int id = resultSet.getInt("id");
                 String nameCourse = resultSet.getString("nameCourse");
-                specialtyGeologyTableModel.addRow(new Object[]{id, nameCourse});
+                bachelorGeologyTableModel.addRow(new Object[]{id, nameCourse});
             }
         } catch (SQLException e) {
             e.printStackTrace();

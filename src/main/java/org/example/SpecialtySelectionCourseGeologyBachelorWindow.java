@@ -37,9 +37,9 @@ public class SpecialtySelectionCourseGeologyBachelorWindow extends JFrame {
                     if (selectedRow != -1) {
                         int specialtyId = (int) specialtyGeologyTableModel.getValueAt(selectedRow, 0);
                         if (specialtyId == 1) {
-                            new SpecialtySelectionCourseGeologySpecialtyWindow("Специалитет").setVisible(true);
+                            new SpecialtySelectionCourseGeologyBachelorOneCourseWindow("1 курс").setVisible(true);
                         } else if (specialtyId == 2) {
-                            new SpecialtySelectionCourseGeologyBachelorWindow("Бакалавриат").setVisible(true);
+                            new SpecialtySelectionCourseGeologyBachelorWindow("2 курс").setVisible(true);
                         }
                     }
                 }
@@ -49,7 +49,7 @@ public class SpecialtySelectionCourseGeologyBachelorWindow extends JFrame {
 
     private void loadCourseGeologyFromDatabase() {
         try (Connection connection = DBConnector.connection();
-             PreparedStatement preparedStatement = connection.prepareStatement("SELECT id, nameCourse FROM specialtyCourse WHERE idProgram = ?")) {
+             PreparedStatement preparedStatement = connection.prepareStatement("SELECT id, nameCourse FROM specialtyCourse WHERE idnameIndustry = ?")) {
 
             preparedStatement.setInt(1, 1); // 1 -  idNameIndustry для 1 курса
             ResultSet resultSet = preparedStatement.executeQuery();
