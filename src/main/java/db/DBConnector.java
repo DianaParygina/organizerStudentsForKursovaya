@@ -3,6 +3,9 @@ package db;
 //import org.example.Item;
 //import org.example.Task;
 
+//import org.example.Item;
+import org.example.Task;
+
 import javax.swing.*;
 import java.sql.*;
 import java.util.ArrayList;
@@ -39,8 +42,8 @@ public class DBConnector {
 
     public static void createDB() throws SQLException {
         Statement statmt = conn.createStatement();
-        //statmt.execute("CREATE TABLE if not exists 'item' ('id' INTEGER PRIMARY KEY AUTOINCREMENT, 'name' text, 'number_of_hours' integer);");
-        //statmt.execute("CREATE TABLE if not exists 'tasks' ('id' INTEGER PRIMARY KEY AUTOINCREMENT, 'type' text, 'target' text, 'due_date' string, 'done' boolean, 'item_id' INTEGER, FOREIGN KEY (item_id) REFERENCES item (id));");
+        statmt.execute("CREATE TABLE if not exists 'Предметы' ('id' INTEGER PRIMARY KEY AUTOINCREMENT, 'name' text, 'number_of_hours' integer, 'idWho' INTEGER, 'idCourse' INTEGER,'idProgram' INTEGER, FOREIGN KEY (idWho) REFERENCES Who (id), FOREIGN KEY (idCourse) REFERENCES specialtyCourse (id), FOREIGN KEY (idProgram) REFERENCES EducationalProgram (id));");
+        statmt.execute("CREATE TABLE if not exists 'Работы' ('id' INTEGER PRIMARY KEY AUTOINCREMENT, 'type' text, 'target' text, 'due_date' string, 'done' boolean, 'item_id' INTEGER, FOREIGN KEY (item_id) REFERENCES item (id));");
         statmt.execute("CREATE TABLE if not exists 'Who' ('id' INTEGER PRIMARY KEY AUTOINCREMENT, 'NameIndustry' TEXT);");
     }
 

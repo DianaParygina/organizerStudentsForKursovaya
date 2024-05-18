@@ -6,63 +6,65 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 
-public class GeologyLectures extends JFrame{
-    private final JTable industryTable;
-    private final DefaultTableModel tableModel;
+public class GeologyLectures extends JFrame {
+
+    private final JTable LKTable;
+    private final DefaultTableModel LKTableModel;
 
     public GeologyLectures() {
-        tableModel = new DefaultTableModel(new Object[]{"ID", "NameIndustry"}, 0);
-        industryTable = new JTable(tableModel);
-        JScrollPane scrollPane = new JScrollPane(industryTable);
+        LKTableModel = new DefaultTableModel(new Object[]{"ID", "name", "number_of_hours"}, 0);
+        LKTable = new JTable(LKTableModel);
+        JScrollPane scrollPane = new JScrollPane(LKTable);
         add(scrollPane);
-        setTitle("Список отраслей");
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(400, 150);
+        setTitle("Лекции");
+        setSize(400, 300);
         setLocationRelativeTo(null);
         setVisible(true);
 
-        // Загрузка отраслей из БД
-        loadIndustriesFromDatabase();
+        // Загрузка специальностей из БД
+        loadCourseGeologyFromDatabase();
 
-        industryTable.setCellSelectionEnabled(false);
-        industryTable.setDefaultEditor(Object.class, null);
+        LKTable.setCellSelectionEnabled(false);
+        LKTable.setDefaultEditor(Object.class, null);
 
-        industryTable.addMouseListener(new MouseAdapter() {
+        LKTable.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
                 if (e.getClickCount() == 2) {
-                    int selectedRow = industryTable.getSelectedRow();
+                    int selectedRow = LKTable.getSelectedRow();
                     if (selectedRow != -1) {
-                        int specialtyId = (int) industryTable.getValueAt(selectedRow, 0);
-                        if (specialtyId == 1) {
-                            new SpecialtySelection("Горное дело").setVisible(true);
-                        } else if (specialtyId == 2) {
-                            new SpecialtySelection("ИСТ").setVisible(true);
-                        }
+                        int specialtyId = (int) LKTableModel.getValueAt(selectedRow, 0);
+                        openLecturesForSpecialty(specialtyId);
                     }
                 }
             }
         });
     }
 
-    private void loadIndustriesFromDatabase() {
+    private void loadCourseGeologyFromDatabase() {
         try (Connection connection = DBConnector.connection();
-             PreparedStatement preparedStatement = connection.prepareStatement("SELECT id, NameIndustry FROM who")) {
+             PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM ПредметыПервыйКурсСпециалитетГеологи")) { // Убираем условие WHERE id = ?
 
             ResultSet resultSet = preparedStatement.executeQuery();
             while (resultSet.next()) {
                 int id = resultSet.getInt("id");
-                String nameIndustry = resultSet.getString("NameIndustry");
-                tableModel.addRow(new Object[]{id, nameIndustry});
+                String name = resultSet.getString("name");
+                int number_of_hours = resultSet.getInt("number_of_hours");
+                LKTableModel.addRow(new Object[]{id, name, number_of_hours});
             }
         } catch (SQLException e) {
             e.printStackTrace();
             JOptionPane.showMessageDialog(this, "Ошибка при получении данных из базы данных.", "Ошибка", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    private void openLecturesForSpecialty(int specialtyId) {
+        if (specialtyId == 1) {
+            new GeologyLectures().setVisible(true); // Замените GeologyLectures на класс, который отображает лекции для геологии
+        } else if (specialtyId == 2) {
+            new ISTLectures().setVisible(true); // Замените ISTLectures на класс, который отображает лекции для ИСТ
         }
     }
 }

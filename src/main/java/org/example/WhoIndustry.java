@@ -10,11 +10,13 @@ import java.sql.*;
 
 public class WhoIndustry extends JFrame {
     private final JTable industryTable;
-    private final DefaultTableModel tableModel;
+    private final DefaultTableModel industryTableModel;
+
+    private int selectedIndustryId = -1;
 
     public WhoIndustry() {
-        tableModel = new DefaultTableModel(new Object[]{"ID", "NameIndustry"}, 0);
-        industryTable = new JTable(tableModel);
+        industryTableModel = new DefaultTableModel(new Object[]{"ID", "NameIndustry"}, 0);
+        industryTable = new JTable(industryTableModel);
         JScrollPane scrollPane = new JScrollPane(industryTable);
         add(scrollPane);
         setTitle("Список отраслей");
@@ -35,12 +37,8 @@ public class WhoIndustry extends JFrame {
                 if (e.getClickCount() == 2) {
                     int selectedRow = industryTable.getSelectedRow();
                     if (selectedRow != -1) {
-                        int specialtyId = (int) industryTable.getValueAt(selectedRow, 0);
-                        if (specialtyId == 1) {
-                            new SpecialtySelection("Горное дело").setVisible(true);
-                        } else if (specialtyId == 2) {
-                            new SpecialtySelection("ИСТ").setVisible(true);
-                        }
+                        selectedIndustryId = (int) industryTable.getValueAt(selectedRow, 0); // Сохраняем выбранный ID
+                        new SpecialtySelection(selectedIndustryId).setVisible(true); // Передаем ID в SpecialtySelection
                     }
                 }
             }
@@ -55,7 +53,7 @@ public class WhoIndustry extends JFrame {
             while (resultSet.next()) {
                 int id = resultSet.getInt("id");
                 String nameIndustry = resultSet.getString("NameIndustry");
-                tableModel.addRow(new Object[]{id, nameIndustry});
+                industryTableModel.addRow(new Object[]{id, nameIndustry});
             }
         } catch (SQLException e) {
             e.printStackTrace();

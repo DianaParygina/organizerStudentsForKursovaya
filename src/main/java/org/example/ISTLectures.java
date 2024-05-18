@@ -39,11 +39,11 @@ public class ISTLectures extends JFrame {
                     int selectedRow = industryTable.getSelectedRow();
                     if (selectedRow != -1) {
                         int specialtyId = (int) industryTable.getValueAt(selectedRow, 0);
-                        if (specialtyId == 1) {
-                            new SpecialtySelection("Горное дело").setVisible(true);
-                        } else if (specialtyId == 2) {
-                            new SpecialtySelection("ИСТ").setVisible(true);
-                        }
+//                        if (specialtyId == 1) {
+//                            new SpecialtySelection("Горное дело").setVisible(true);
+//                        } else if (specialtyId == 2) {
+//                            new SpecialtySelection("ИСТ").setVisible(true);
+//                        }
                     }
                 }
             }

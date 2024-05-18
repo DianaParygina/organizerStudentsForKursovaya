@@ -6,25 +6,30 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
-public class Course extends JFrame {
-
+class Course extends JFrame {
     private final JTable courseTable;
     private final DefaultTableModel courseTableModel;
 
-    public Course(String title) {
+    private int selectedCourse = -1;
+
+    public Course(int CourseId) {
         courseTableModel = new DefaultTableModel(new Object[]{"ID", "nameCourse"}, 0);
         courseTable = new JTable(courseTableModel);
         JScrollPane scrollPane = new JScrollPane(courseTable);
         add(scrollPane);
-        setTitle(title);
-        setSize(400, 300);
+        setTitle("Список курсов");
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        setSize(400, 150);
         setLocationRelativeTo(null);
         setVisible(true);
 
         // Загрузка специальностей из БД
-        loadCourseGeologyFromDatabase();
+        loadSpecialtiesFromDatabase(CourseId);
 
         courseTable.setCellSelectionEnabled(false);
         courseTable.setDefaultEditor(Object.class, null);
@@ -32,26 +37,22 @@ public class Course extends JFrame {
         courseTable.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                if (e.getClickCount() == 2) { // getClickCount() -  верный метод для определения двойного клика
+                if (e.getClickCount() == 2) {
                     int selectedRow = courseTable.getSelectedRow();
                     if (selectedRow != -1) {
-                        int specialtyId = (int) courseTableModel.getValueAt(selectedRow, 0);
-                        if (specialtyId == 1) {
-                            new TypeWorks("1 курс").setVisible(true);
-                        } else if (specialtyId == 2) {
-                            new TypeWorks("2 курс").setVisible(true);
-                        }
+                        selectedCourse = (int) courseTable.getValueAt(selectedRow, 0); // Сохраняем выбранный ID
+                        new Items(selectedCourse).setVisible(true); // Передаем ID в SpecialtySelection
                     }
                 }
             }
         });
     }
 
-    private void loadCourseGeologyFromDatabase() {
+    private void loadSpecialtiesFromDatabase(int CourseId) {
         try (Connection connection = DBConnector.connection();
-             PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM specialtyCourse WHERE idnameIndustry = ?")) {
+             PreparedStatement preparedStatement = connection.prepareStatement("SELECT id, nameCourse FROM specialtyCourse WHERE idNameProgram = ?")) {
 
-            preparedStatement.setInt(1, 1); // 1 -  idNameIndustry для 1 курса
+            preparedStatement.setInt(1, CourseId); // Устанавливаем ID отрасли
             ResultSet resultSet = preparedStatement.executeQuery();
             while (resultSet.next()) {
                 int id = resultSet.getInt("id");
@@ -63,4 +64,8 @@ public class Course extends JFrame {
             JOptionPane.showMessageDialog(this, "Ошибка при получении данных из базы данных.", "Ошибка", JOptionPane.ERROR_MESSAGE);
         }
     }
+
+
 }
+
+

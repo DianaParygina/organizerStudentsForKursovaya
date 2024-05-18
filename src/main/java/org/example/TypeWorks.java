@@ -6,26 +6,30 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.sql.*;
-import java.util.List;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
-public class TypeWorks extends JFrame {
-
+class TypeWorks extends JFrame {
     private final JTable typeWorksTable;
     private final DefaultTableModel typeWorksTableModel;
 
-    public TypeWorks(String title) {
+    private int selectedTypeWorks = -1;
+
+    public TypeWorks(int TypeWorksId) {
         typeWorksTableModel = new DefaultTableModel(new Object[]{"ID", "nameType"}, 0);
         typeWorksTable = new JTable(typeWorksTableModel);
         JScrollPane scrollPane = new JScrollPane(typeWorksTable);
         add(scrollPane);
-        setTitle(title);
-        setSize(400, 300);
+        setTitle("Список типов");
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        setSize(400, 150);
         setLocationRelativeTo(null);
         setVisible(true);
 
         // Загрузка специальностей из БД
-        loadCourseGeologyFromDatabase();
+        loadSpecialtiesFromDatabase(TypeWorksId);
 
         typeWorksTable.setCellSelectionEnabled(false);
         typeWorksTable.setDefaultEditor(Object.class, null);
@@ -33,28 +37,22 @@ public class TypeWorks extends JFrame {
         typeWorksTable.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                if (e.getClickCount() == 2) { // getClickCount() -  верный метод для определения двойного клика
+                if (e.getClickCount() == 2) {
                     int selectedRow = typeWorksTable.getSelectedRow();
                     if (selectedRow != -1) {
-                        int specialtyId = (int) typeWorksTableModel.getValueAt(selectedRow, 0);
-                        if (specialtyId == 1) {
-                            new LK("ЛК").setVisible(true);
-                        } else if (specialtyId == 2) {
-                           // new SpecialtySelectionCourseGeologyBachelorWindow("ЛР").setVisible(true);
-                        } else if (specialtyId == 3) {
-                            // SpecialtySelectionCourseGeologyBachelorWindow("ПК").setVisible(true);
-                        }
+                        selectedTypeWorks = (int) typeWorksTable.getValueAt(selectedRow, 0); // Сохраняем выбранный ID
+                        new Items(selectedTypeWorks).setVisible(true); // Передаем ID в SpecialtySelection
                     }
                 }
             }
         });
     }
 
-    private void loadCourseGeologyFromDatabase() {
+    private void loadSpecialtiesFromDatabase(int TypeWorksId) {
         try (Connection connection = DBConnector.connection();
-             PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM ПредметыПервыйКурсСпециалитетГеологиТип WHERE idCourse = ?")) {
+             PreparedStatement preparedStatement = connection.prepareStatement("SELECT id, nameType FROM ПредметыПервыйКурсСпециалитетГеологиТип WHERE idCourse = ?")) {
 
-            preparedStatement.setInt(1, 1); // 1 -  idNameIndustry для 1 курса
+            preparedStatement.setInt(1, TypeWorksId); // Устанавливаем ID отрасли
             ResultSet resultSet = preparedStatement.executeQuery();
             while (resultSet.next()) {
                 int id = resultSet.getInt("id");
@@ -66,4 +64,8 @@ public class TypeWorks extends JFrame {
             JOptionPane.showMessageDialog(this, "Ошибка при получении данных из базы данных.", "Ошибка", JOptionPane.ERROR_MESSAGE);
         }
     }
+
+
 }
+
+
