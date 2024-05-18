@@ -6,13 +6,16 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
-public class WhoIndustry extends JFrame {
+public class GeologyLectures extends JFrame{
     private final JTable industryTable;
     private final DefaultTableModel tableModel;
 
-    public WhoIndustry() {
+    public GeologyLectures() {
         tableModel = new DefaultTableModel(new Object[]{"ID", "NameIndustry"}, 0);
         industryTable = new JTable(tableModel);
         JScrollPane scrollPane = new JScrollPane(industryTable);
