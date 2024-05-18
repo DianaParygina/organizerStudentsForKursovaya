@@ -11,18 +11,18 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-class LK extends JFrame {
+class Tasks extends JFrame {
     private final JTable LKTable;
     private final DefaultTableModel typeWorksTableModel;
 
-    private int selectedTypeWorks = -1;
+    private int selectedTasks = -1;
 
-    public LK(int TypeWorksId) {
+    public Tasks(int TypeWorksId) {
         typeWorksTableModel = new DefaultTableModel(new Object[]{"ID", "nameType"}, 0);
         LKTable = new JTable(typeWorksTableModel);
         JScrollPane scrollPane = new JScrollPane(LKTable);
         add(scrollPane);
-        setTitle("Список типов");
+        setTitle("Список работ");
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setSize(400, 150);
         setLocationRelativeTo(null);
@@ -40,8 +40,8 @@ class LK extends JFrame {
                 if (e.getClickCount() == 2) {
                     int selectedRow = LKTable.getSelectedRow();
                     if (selectedRow != -1) {
-                        selectedTypeWorks = (int) LKTable.getValueAt(selectedRow, 0); // Сохраняем выбранный ID
-                        new TypeWorks(selectedTypeWorks).setVisible(true); // Передаем ID в SpecialtySelection
+                        selectedTasks = (int) LKTable.getValueAt(selectedRow, 0); // Сохраняем выбранный ID
+                        new TypeWorks(selectedTasks).setVisible(true); // Передаем ID в SpecialtySelection
                     }
                 }
             }

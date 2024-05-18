@@ -29,7 +29,7 @@ class TypeWorks extends JFrame {
         setVisible(true);
 
         // Загрузка специальностей из БД
-        loadSpecialtiesFromDatabase(TypeWorksId);
+        loadSpecialtiesFromDatabase();
 
         typeWorksTable.setCellSelectionEnabled(false);
         typeWorksTable.setDefaultEditor(Object.class, null);
@@ -48,11 +48,10 @@ class TypeWorks extends JFrame {
         });
     }
 
-    private void loadSpecialtiesFromDatabase(int TypeWorksId) {
+    private void loadSpecialtiesFromDatabase() {
         try (Connection connection = DBConnector.connection();
-             PreparedStatement preparedStatement = connection.prepareStatement("SELECT id, nameType FROM ПредметыПервыйКурсСпециалитетГеологиТип WHERE idCourse = ?")) {
+             PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM Тип")) {
 
-            preparedStatement.setInt(1, TypeWorksId); // Устанавливаем ID отрасли
             ResultSet resultSet = preparedStatement.executeQuery();
             while (resultSet.next()) {
                 int id = resultSet.getInt("id");
