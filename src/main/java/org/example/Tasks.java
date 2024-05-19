@@ -12,15 +12,15 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 class Tasks extends JFrame {
-    private final JTable LKTable;
-    private final DefaultTableModel typeWorksTableModel;
+    private final JTable tasksTable;
+    private final DefaultTableModel tasksTableModel;
 
     private int selectedTasks = -1;
 
-    public Tasks(int TypeWorksId) {
-        typeWorksTableModel = new DefaultTableModel(new Object[]{"ID", "nameType"}, 0);
-        LKTable = new JTable(typeWorksTableModel);
-        JScrollPane scrollPane = new JScrollPane(LKTable);
+    public Tasks(int TypeWorksId, int ItemsId) {
+        tasksTableModel = new DefaultTableModel(new Object[]{"ID", "target", "hours", "done"}, 0);
+        tasksTable = new JTable(tasksTableModel);
+        JScrollPane scrollPane = new JScrollPane(tasksTable);
         add(scrollPane);
         setTitle("Список работ");
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -29,35 +29,38 @@ class Tasks extends JFrame {
         setVisible(true);
 
         // Загрузка специальностей из БД
-        loadSpecialtiesFromDatabase(TypeWorksId);
+        loadSpecialtiesFromDatabase(TypeWorksId, ItemsId);
 
-        LKTable.setCellSelectionEnabled(false);
-        LKTable.setDefaultEditor(Object.class, null);
+        tasksTable.setCellSelectionEnabled(false);
+        tasksTable.setDefaultEditor(Object.class, null);
 
-        LKTable.addMouseListener(new MouseAdapter() {
+        tasksTable.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
                 if (e.getClickCount() == 2) {
-                    int selectedRow = LKTable.getSelectedRow();
+                    int selectedRow = tasksTable.getSelectedRow();
                     if (selectedRow != -1) {
-                        selectedTasks = (int) LKTable.getValueAt(selectedRow, 0); // Сохраняем выбранный ID
-                        new TypeWorks(selectedTasks).setVisible(true); // Передаем ID в SpecialtySelection
+                        selectedTasks = (int) tasksTable.getValueAt(selectedRow, 0); // Сохраняем выбранный ID
+                        //new TypeWorks(selectedTasks).setVisible(true); // Передаем ID в SpecialtySelection
                     }
                 }
             }
         });
     }
 
-    private void loadSpecialtiesFromDatabase(int TypeWorksId) {
+    private void loadSpecialtiesFromDatabase(int TypeWorksId, int ItemsId) {
         try (Connection connection = DBConnector.connection();
-             PreparedStatement preparedStatement = connection.prepareStatement("SELECT id, nameType FROM ПредметыПервыйКурсСпециалитетГеологиТип WHERE idCourse = ?")) {
+             PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM Работы WHERE idItem = ? AND idType = ?")) {
 
-            preparedStatement.setInt(1, TypeWorksId); // Устанавливаем ID отрасли
+            preparedStatement.setInt(1, ItemsId); // Устанавливаем ID предмета
+            preparedStatement.setInt(2, TypeWorksId); // Устанавливаем ID типа работы
             ResultSet resultSet = preparedStatement.executeQuery();
             while (resultSet.next()) {
                 int id = resultSet.getInt("id");
-                String nameType = resultSet.getString("nameType");
-                typeWorksTableModel.addRow(new Object[]{id, nameType});
+                String target = resultSet.getString("target");
+                int hours = resultSet.getInt("hours");
+                int done = resultSet.getInt("done");
+                tasksTableModel.addRow(new Object[]{id, target, hours, done});
             }
         } catch (SQLException e) {
             e.printStackTrace();

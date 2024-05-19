@@ -17,7 +17,7 @@ class TypeWorks extends JFrame {
 
     private int selectedTypeWorks = -1;
 
-    public TypeWorks(int TypeWorksId) {
+    public TypeWorks(int ItemsId) {
         typeWorksTableModel = new DefaultTableModel(new Object[]{"ID", "nameType"}, 0);
         typeWorksTable = new JTable(typeWorksTableModel);
         JScrollPane scrollPane = new JScrollPane(typeWorksTable);
@@ -29,7 +29,7 @@ class TypeWorks extends JFrame {
         setVisible(true);
 
         // Загрузка специальностей из БД
-        loadSpecialtiesFromDatabase();
+        loadSpecialtiesFromDatabase(ItemsId);
 
         typeWorksTable.setCellSelectionEnabled(false);
         typeWorksTable.setDefaultEditor(Object.class, null);
@@ -41,14 +41,14 @@ class TypeWorks extends JFrame {
                     int selectedRow = typeWorksTable.getSelectedRow();
                     if (selectedRow != -1) {
                         selectedTypeWorks = (int) typeWorksTable.getValueAt(selectedRow, 0); // Сохраняем выбранный ID
-                        new Items(selectedTypeWorks).setVisible(true); // Передаем ID в SpecialtySelection
+                        new Tasks(selectedTypeWorks, ItemsId).setVisible(true); // Передаем ID в SpecialtySelection
                     }
                 }
             }
         });
     }
 
-    private void loadSpecialtiesFromDatabase() {
+    private void loadSpecialtiesFromDatabase(int ItemsId) {
         try (Connection connection = DBConnector.connection();
              PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM Тип")) {
 

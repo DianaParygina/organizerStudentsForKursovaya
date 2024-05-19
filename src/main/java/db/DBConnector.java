@@ -4,12 +4,8 @@ package db;
 //import org.example.Task;
 
 //import org.example.Item;
-import org.example.Task;
 
-import javax.swing.*;
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
 
 public class DBConnector {
     public static final String PATH_TO_DB_FILE = "databasestates.db";
