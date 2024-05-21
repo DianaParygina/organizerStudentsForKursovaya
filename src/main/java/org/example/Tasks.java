@@ -16,10 +16,16 @@ import java.sql.SQLException;
 class Tasks extends JFrame {
     private final JTable tasksTable;
     private final DefaultTableModel tasksTableModel;
+    private int TypeWorksId;
+    private int ItemsId;
 
     private int selectedTasks = -1;
 
     public Tasks(int TypeWorksId, int ItemsId) {
+
+        this.TypeWorksId = TypeWorksId; // Сохраняем TypeWorksId
+        this.ItemsId = ItemsId;         // Сохраняем ItemsId
+
         tasksTableModel = new DefaultTableModel(new Object[]{"ID", "target", "hours", "done"}, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
@@ -81,7 +87,7 @@ class Tasks extends JFrame {
                     int selectedRow = tasksTable.getSelectedRow();
                     if (selectedRow != -1) {
                         selectedTasks = (int) tasksTable.getValueAt(selectedRow, 0); // Сохраняем выбранный ID
-                        new AdditionalTasks(selectedTasks).setVisible(true); // Передаем ID в SpecialtySelection
+                        new AdditionalTasks(selectedTasks, Tasks.this).setVisible(true); // Передаем ID в SpecialtySelection
                     }
                 }
             }
@@ -102,6 +108,20 @@ class Tasks extends JFrame {
                 return c;
             }
         });
+    }
+
+
+
+    public void refreshTable() {
+        // Очистить существующие данные
+        tasksTableModel.setRowCount(0);
+
+        // Загрузить обновленные данные из базы данных
+        loadSpecialtiesFromDatabase(TypeWorksId, ItemsId); // Подставьте ваши значения
+
+        // Обновить отображение таблицы
+        tasksTable.revalidate();
+        tasksTable.repaint();
     }
 
 

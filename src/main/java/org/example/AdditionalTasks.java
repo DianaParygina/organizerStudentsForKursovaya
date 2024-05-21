@@ -18,10 +18,12 @@ class AdditionalTasks extends JFrame {
     private long startTime;
     private long elapsedTime = 0; // Переменная для хранения прошедшего времени
     private Button startTimer; // Сделаем кнопку доступной для изменения
+    private Tasks tasks;
 
-    public AdditionalTasks(int selectedTasks) {
+    public AdditionalTasks(int selectedTasks, Tasks tasks) {
 
         this.selectedTask = selectedTasks;
+        this.tasks = tasks;
 
         setTitle("Моя работа");
         setSize(400, 200);
@@ -60,6 +62,8 @@ class AdditionalTasks extends JFrame {
         Button deleteTasks = new Button("Удалить работу");
         deleteTasks.addActionListener(e -> {
             deleteTask(selectedTask);
+            tasks.refreshTable();
+            dispose();
         });
 
         // Метка для отображения таймера
@@ -93,6 +97,7 @@ class AdditionalTasks extends JFrame {
                 saveElapsedTimeToDatabase();
             }
         });
+
     }
 
 
