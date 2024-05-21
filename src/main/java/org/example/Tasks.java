@@ -49,9 +49,6 @@ class Tasks extends JFrame {
         tasksTable.setCellSelectionEnabled(false);
 
 
-
-
-
         // Добавляем обработчик изменения значения в таблице
         tasksTable.getModel().addTableModelListener(e -> {
             // Обновление значения в базе данных
@@ -77,21 +74,18 @@ class Tasks extends JFrame {
 
 
 
-
-//        tasksTable.addMouseListener(new MouseAdapter() {
-//            @Override
-//            public void mouseClicked(MouseEvent e) {
-//                if (e.getClickCount() == 2) {
-//                    int selectedRow = tasksTable.getSelectedRow();
-//                    if (selectedRow != -1) {
-//                        selectedTasks = (int) tasksTable.getValueAt(selectedRow, 0); // Сохраняем выбранный ID
-//                        //new TypeWorks(selectedTasks).setVisible(true); // Передаем ID в SpecialtySelection
-//                    }
-//                }
-//            }
-//        });
-
-
+        tasksTable.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (e.getClickCount() == 2) {
+                    int selectedRow = tasksTable.getSelectedRow();
+                    if (selectedRow != -1) {
+                        selectedTasks = (int) tasksTable.getValueAt(selectedRow, 0); // Сохраняем выбранный ID
+                        new AdditionalTasks(selectedTasks).setVisible(true); // Передаем ID в SpecialtySelection
+                    }
+                }
+            }
+        });
 
 
 
@@ -109,10 +103,6 @@ class Tasks extends JFrame {
             }
         });
     }
-
-
-
-
 
 
 

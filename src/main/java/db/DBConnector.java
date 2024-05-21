@@ -17,7 +17,6 @@ public class DBConnector {
             conn = DriverManager.getConnection(URL);
             if (conn != null) {
                 DatabaseMetaData meta = conn.getMetaData();
-                System.out.println("Драйвер: " + meta.getDriverName());
             }
         } catch (SQLException ex) {
             System.out.println("Ошибка подключения к БД: " + ex);
@@ -39,8 +38,32 @@ public class DBConnector {
     public static void createDB() throws SQLException {
         Statement statmt = conn.createStatement();
         statmt.execute("CREATE TABLE if not exists 'Предметы' ('id' INTEGER PRIMARY KEY AUTOINCREMENT, 'name' text, 'number_of_hours' integer, 'idWho' INTEGER, 'idCourse' INTEGER,'idProgram' INTEGER, FOREIGN KEY (idWho) REFERENCES Who (id), FOREIGN KEY (idCourse) REFERENCES specialtyCourse (id), FOREIGN KEY (idProgram) REFERENCES EducationalProgram (id));");
-        statmt.execute("CREATE TABLE if not exists 'Работы' ('id' INTEGER PRIMARY KEY AUTOINCREMENT, 'type' text, 'target' text, 'due_date' string, 'done' boolean, 'item_id' INTEGER, FOREIGN KEY (item_id) REFERENCES item (id));");
+        statmt.execute("CREATE TABLE if not exists 'Работы' ('id' INTEGER PRIMARY KEY AUTOINCREMENT, 'type' text, 'target' text, 'due_date' string, 'done' boolean, 'elapsedTime' int, 'item_id' INTEGER, FOREIGN KEY (item_id) REFERENCES item (id));");
         statmt.execute("CREATE TABLE if not exists 'Who' ('id' INTEGER PRIMARY KEY AUTOINCREMENT, 'NameIndustry' TEXT);");
+    }
+
+    // Метод для сохранения прошедшего времени в базу данных
+    public static void saveElapsedTimeToDatabase(int taskId, long elapsedTime) throws SQLException {
+        try (Connection connection = connection();
+             PreparedStatement preparedStatement = connection.prepareStatement("UPDATE Работы SET elapsedTime = ? WHERE id = ?")) {
+            preparedStatement.setLong(1, elapsedTime);
+            preparedStatement.setInt(2, taskId);
+            preparedStatement.executeUpdate();
+        }
+    }
+
+    // Метод для загрузки прошедшего времени из базы данных
+    public static long loadElapsedTimeFromDatabase(int taskId) throws SQLException {
+        long elapsedTime = 0;
+        try (Connection connection = connection();
+             PreparedStatement preparedStatement = connection.prepareStatement("SELECT elapsedTime FROM Работы WHERE id = ?")) {
+            preparedStatement.setInt(1, taskId);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            if (resultSet.next()) {
+                elapsedTime = resultSet.getLong("elapsedTime");
+            }
+        }
+        return elapsedTime;
     }
 
 //    public static List<Item> getAllItem() throws SQLException {
