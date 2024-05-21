@@ -22,7 +22,7 @@ class TypeWorks extends JFrame {
         typeWorksTable = new JTable(typeWorksTableModel);
         JScrollPane scrollPane = new JScrollPane(typeWorksTable);
         add(scrollPane);
-        setTitle("Список типов");
+        setTitle("Предмет");
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setSize(400, 150);
         setLocationRelativeTo(null);

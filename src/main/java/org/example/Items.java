@@ -16,6 +16,7 @@ class Items extends JFrame {
     private final DefaultTableModel ItemsTableModel;
 
     private int selectedItems = -1;
+    private int selectedItemsHours = 0; // Переменная для хранения количества часов
 
     public Items(int ItemsId) {
         ItemsTableModel = new DefaultTableModel(new Object[]{"ID", "name", "number_of_hours"}, 0);
@@ -41,6 +42,7 @@ class Items extends JFrame {
                     int selectedRow = ItemsTable.getSelectedRow();
                     if (selectedRow != -1) {
                         selectedItems = (int) ItemsTable.getValueAt(selectedRow, 0); // Сохраняем выбранный ID
+                        selectedItemsHours = (int) ItemsTable.getValueAt(selectedRow, 2); // Получаем количество часов
                         new TypeWorks(selectedItems).setVisible(true); // Передаем ID в SpecialtySelection
                     }
                 }
