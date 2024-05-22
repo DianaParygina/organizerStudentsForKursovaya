@@ -28,6 +28,8 @@ class AdditionalTasks extends JFrame {
         setTitle("Моя работа");
         setSize(400, 200);
 
+
+
         // Кнопка запуска таймера
         startTimer = new Button("Запустить время");
         startTimer.addActionListener(e -> {
@@ -54,9 +56,14 @@ class AdditionalTasks extends JFrame {
             }
         });
 
+
+
         // Кнопка редактирования задачи
         Button editTasks = new Button("Редактировать работу");
         editTasks.addActionListener(e ->  showEditDialog());
+
+
+
 
         // Кнопка удаления задачи
         Button deleteTasks = new Button("Удалить работу");
@@ -65,6 +72,8 @@ class AdditionalTasks extends JFrame {
             tasks.refreshTable();
             dispose();
         });
+
+
 
         // Метка для отображения таймера
         timerLabel = new JLabel("00:00:00"); // Инициализируй timerLabel
@@ -103,7 +112,7 @@ class AdditionalTasks extends JFrame {
 
     // Добавление слушателя на нажатие кнопки редактирования
     private void showEditDialog() {
-        new showEditDialog();
+        new showEditDialog(selectedTask, tasks);
     }
 
     private void deleteTask(int taskId) {
