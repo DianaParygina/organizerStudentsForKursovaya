@@ -11,24 +11,20 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 class AdditionalTasks extends JFrame {
-
     private int selectedTask;
     private JLabel timerLabel;
     private Timer timer;
     private long startTime;
     private long elapsedTime = 0; // Переменная для хранения прошедшего времени
     private Button startTimer; // Сделаем кнопку доступной для изменения
-    private Tasks tasks;
+    private Tasks tasks; // Ссылка на родительское окно Tasks
 
     public AdditionalTasks(int selectedTasks, Tasks tasks) {
-
         this.selectedTask = selectedTasks;
-        this.tasks = tasks;
+        this.tasks = tasks; // Сохраняем ссылку на родительское окно
 
         setTitle("Моя работа");
         setSize(400, 200);
-
-
 
         // Кнопка запуска таймера
         startTimer = new Button("Запустить время");
@@ -56,14 +52,9 @@ class AdditionalTasks extends JFrame {
             }
         });
 
-
-
         // Кнопка редактирования задачи
         Button editTasks = new Button("Редактировать работу");
-        editTasks.addActionListener(e ->  showEditDialog());
-
-
-
+        editTasks.addActionListener(e -> showEditDialog());
 
         // Кнопка удаления задачи
         Button deleteTasks = new Button("Удалить работу");
@@ -72,8 +63,6 @@ class AdditionalTasks extends JFrame {
             tasks.refreshTable();
             dispose();
         });
-
-
 
         // Метка для отображения таймера
         timerLabel = new JLabel("00:00:00"); // Инициализируй timerLabel
@@ -106,9 +95,7 @@ class AdditionalTasks extends JFrame {
                 saveElapsedTimeToDatabase();
             }
         });
-
     }
-
 
     // Добавление слушателя на нажатие кнопки редактирования
     private void showEditDialog() {
@@ -132,7 +119,6 @@ class AdditionalTasks extends JFrame {
         long hours = minutes / 60;
         seconds %= 60;
         minutes %= 60;
-
         return String.format("%02d:%02d:%02d", hours, minutes, seconds);
     }
 
@@ -150,6 +136,8 @@ class AdditionalTasks extends JFrame {
     private void saveElapsedTimeToDatabase() {
         try {
             DBConnector.saveElapsedTimeToDatabase(selectedTask, elapsedTime);
+            // Обновляем общее время в родительском окне
+            tasks.refreshParentTotalTime();
         } catch (SQLException e) {
             e.printStackTrace();
         }

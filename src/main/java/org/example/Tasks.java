@@ -3,10 +3,10 @@ package org.example;
 import db.DBConnector;
 
 import javax.swing.*;
-import javax.swing.table.DefaultTableCellRenderer;
+        import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
-import java.awt.event.MouseAdapter;
+        import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -18,13 +18,13 @@ class Tasks extends JFrame {
     private final DefaultTableModel tasksTableModel;
     private int TypeWorksId;
     private int ItemsId;
-
     private int selectedTasks = -1;
+    private final TypeWorks parentTypeWorks; // Ссылка на родительское окно
 
-    public Tasks(int TypeWorksId, int ItemsId) {
-
+    public Tasks(int TypeWorksId, int ItemsId, TypeWorks parentTypeWorks) {
         this.TypeWorksId = TypeWorksId; // Сохраняем TypeWorksId
         this.ItemsId = ItemsId;         // Сохраняем ItemsId
+        this.parentTypeWorks = parentTypeWorks; // Сохраняем ссылку на родительское окно
 
         tasksTableModel = new DefaultTableModel(new Object[]{"ID", "target", "hours", "done"}, 0) {
             @Override
@@ -78,8 +78,6 @@ class Tasks extends JFrame {
             }
         });
 
-
-
         tasksTable.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -92,8 +90,6 @@ class Tasks extends JFrame {
                 }
             }
         });
-
-
 
         // Устанавливаем рендерер для всей строки
         tasksTable.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
@@ -110,8 +106,6 @@ class Tasks extends JFrame {
         });
     }
 
-
-
     public void refreshTable() {
         // Очистить существующие данные
         tasksTableModel.setRowCount(0);
@@ -123,8 +117,6 @@ class Tasks extends JFrame {
         tasksTable.revalidate();
         tasksTable.repaint();
     }
-
-
 
     private void loadSpecialtiesFromDatabase(int TypeWorksId, int ItemsId) {
         try (Connection connection = DBConnector.connection();
@@ -143,6 +135,13 @@ class Tasks extends JFrame {
         } catch (SQLException e) {
             e.printStackTrace();
             JOptionPane.showMessageDialog(this, "Ошибка при получении данных из базы данных.", "Ошибка", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    // Метод для обновления общего времени в родительском окне
+    public void refreshParentTotalTime() {
+        if (parentTypeWorks != null) {
+            parentTypeWorks.updateTotalTime(ItemsId);
         }
     }
 }

@@ -65,6 +65,9 @@ public class DBConnector {
         }
         return elapsedTime;
     }
+}
+
+
 
 //    public static List<Item> getAllItem() throws SQLException {
 //        Statement statement = conn.createStatement();
@@ -142,4 +145,3 @@ public class DBConnector {
 //        }
 //        return result;
 //    }
-}
