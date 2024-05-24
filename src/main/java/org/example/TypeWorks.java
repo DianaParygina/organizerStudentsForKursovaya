@@ -28,6 +28,7 @@ class TypeWorks extends JFrame {
         headerLabel.setFont(new Font("Arial", Font.BOLD, 14));
         headerPanel.add(headerLabel);
 
+        //headerPanel.add(Box.createRigidArea(new Dimension(0, 10)));
         // Добавляем метку для общего времени
         totalTimeLabel = new JLabel("Общее время: 00:00:00");
         headerPanel.add(totalTimeLabel);

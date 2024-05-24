@@ -26,15 +26,15 @@ class Tasks extends JFrame {
         this.ItemsId = ItemsId;         // Сохраняем ItemsId
         this.parentTypeWorks = parentTypeWorks; // Сохраняем ссылку на родительское окно
 
-        tasksTableModel = new DefaultTableModel(new Object[]{"ID", "target", "hours", "done"}, 0) {
+        tasksTableModel = new DefaultTableModel(new Object[]{"ID", "target", "hours", "dueDate", "done"}, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
-                return column == 3; // Только столбец "done" редактируемый
+                return column == 4; // Только столбец "done" редактируемый
             }
 
             @Override
             public Class<?> getColumnClass(int columnIndex) {
-                if (columnIndex == 3) {
+                if (columnIndex == 4) {
                     return Boolean.class; // Тип данных столбца "done" - boolean
                 }
                 return super.getColumnClass(columnIndex);
@@ -60,7 +60,7 @@ class Tasks extends JFrame {
             // Обновление значения в базе данных
             int row = e.getFirstRow();
             int column = e.getColumn();
-            if (column == 3) { // Изменение в столбце "done"
+            if (column == 4) { // Изменение в столбце "done"
                 int id = (int) tasksTable.getValueAt(row, 0);
                 boolean done = (boolean) tasksTable.getValueAt(row, column);
                 try (Connection connection = DBConnector.connection();
@@ -96,7 +96,7 @@ class Tasks extends JFrame {
             @Override
             public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
                 Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-                if ((boolean) tasksTable.getValueAt(row, 3)) {
+                if ((boolean) tasksTable.getValueAt(row, 4)) {
                     c.setBackground(Color.GREEN);
                 } else {
                     c.setBackground(table.getBackground());
@@ -130,7 +130,8 @@ class Tasks extends JFrame {
                 String target = resultSet.getString("target");
                 int hours = resultSet.getInt("hours");
                 boolean done = resultSet.getInt("done") == 1;
-                tasksTableModel.addRow(new Object[]{id, target, hours, done});
+                String dueDate = resultSet.getString("dueDate");
+                tasksTableModel.addRow(new Object[]{id, target, hours, dueDate, done});
             }
         } catch (SQLException e) {
             e.printStackTrace();
