@@ -3,15 +3,18 @@ package org.example;
 import db.DBConnector;
 
 import javax.swing.*;
-        import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
-        import java.awt.event.MouseAdapter;
+import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 class Tasks extends JFrame {
     private final JTable tasksTable;
@@ -36,6 +39,8 @@ class Tasks extends JFrame {
             public Class<?> getColumnClass(int columnIndex) {
                 if (columnIndex == 4) {
                     return Boolean.class; // Тип данных столбца "done" - boolean
+                } else if (columnIndex == 3) {
+                    return String.class; // Тип данных столбца "dueDate" - String
                 }
                 return super.getColumnClass(columnIndex);
             }
@@ -75,7 +80,22 @@ class Tasks extends JFrame {
                     ex.printStackTrace();
                     JOptionPane.showMessageDialog(this, "Ошибка при обновлении данных в базе данных.", "Ошибка", JOptionPane.ERROR_MESSAGE);
                 }
+            }else if (column == 3) { // Изменение в столбце "dueDate"
+                int id = (int) tasksTable.getValueAt(row, 0);
+                String dueDateString = (String) tasksTable.getValueAt(row, 3);
+                try (Connection connection = DBConnector.connection();
+                     PreparedStatement preparedStatement = connection.prepareStatement("UPDATE Работы SET dueDate = ? WHERE id = ?")) {
+                    preparedStatement.setString(1, dueDateString);
+                    preparedStatement.setInt(2, id);
+                    preparedStatement.executeUpdate();
+                    tasksTableModel.fireTableRowsUpdated(row, row);
+                } catch (SQLException ex) {
+                    ex.printStackTrace();
+                    JOptionPane.showMessageDialog(this, "Ошибка при обновлении данных в базе данных.", "Ошибка", JOptionPane.ERROR_MESSAGE);
+                }
+
             }
+
         });
 
         tasksTable.addMouseListener(new MouseAdapter() {
@@ -99,11 +119,30 @@ class Tasks extends JFrame {
                 if ((boolean) tasksTable.getValueAt(row, 4)) {
                     c.setBackground(Color.GREEN);
                 } else {
-                    c.setBackground(table.getBackground());
+                    // Проверяем dueDate и устанавливаем цвет строки
+                    String dueDateDateString = (String) tasksTable.getValueAt(row, 3);
+                    if (dueDateDateString != null && !dueDateDateString.isEmpty()) {
+                        try {
+                            Date dueDate = new SimpleDateFormat("yyyy-MM-dd").parse(dueDateDateString);
+                            Date currentDate = new Date();
+                            if (dueDate.before(currentDate)) {
+                                c.setBackground(Color.RED);
+                            } else {
+                                c.setBackground(table.getBackground());
+                            }
+                        } catch (ParseException ex) {
+                            ex.printStackTrace();
+                            c.setBackground(table.getBackground());
+                        }
+                    } else {
+                        c.setBackground(table.getBackground());
+                    }
                 }
                 return c;
             }
         });
+
+
     }
 
     public void refreshTable() {
@@ -131,6 +170,7 @@ class Tasks extends JFrame {
                 int hours = resultSet.getInt("hours");
                 boolean done = resultSet.getInt("done") == 1;
                 String dueDate = resultSet.getString("dueDate");
+
                 tasksTableModel.addRow(new Object[]{id, target, hours, dueDate, done});
             }
         } catch (SQLException e) {
