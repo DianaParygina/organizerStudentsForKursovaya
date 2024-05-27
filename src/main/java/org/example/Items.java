@@ -1,5 +1,7 @@
 package org.example;
+
 import db.DBConnector;
+
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
@@ -18,22 +20,47 @@ class Items extends JFrame {
     private int selectedItemsHours = 0;
 
     public Items(int itemsId) {
+        // Настройки шрифтов
+        Font headerFont = new Font("Arial", Font.BOLD, 16);
+        Font tableFont = new Font("Arial", Font.PLAIN, 14);
+
+        // Заголовок окна
+        setTitle("Список предметов");
+
+        // Модель таблицы
         itemsTableModel = new DefaultTableModel(new Object[]{"ID", "Название", "Количество часов"}, 0);
         itemsTable = new JTable(itemsTableModel);
+        itemsTable.setFont(tableFont);
+        itemsTable.setRowHeight(25);
+
+        // Заголовок
+        JLabel headerLabel = new JLabel("Выберите предмет", SwingConstants.CENTER);
+        headerLabel.setFont(headerFont);
+        headerLabel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+
+        // Панель для заголовка
+        JPanel headerPanel = new JPanel(new GridLayout(1, 1));
+        headerPanel.add(headerLabel);
+
+        // Скролл для таблицы
         JScrollPane scrollPane = new JScrollPane(itemsTable);
 
-        add(scrollPane);
-        setTitle("Список предметов");
+        // Размещение элементов на окне
+        setLayout(new BorderLayout());
+        add(headerPanel, BorderLayout.NORTH);
+        add(scrollPane, BorderLayout.CENTER);
+
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        setSize(400, 150);
+        setSize(450, 200); // Увеличиваем размер окна
         setLocationRelativeTo(null);
         setVisible(true);
 
+        // Загрузка данных
         loadItemsFromDatabase(itemsId);
-
         itemsTable.setCellSelectionEnabled(false);
         itemsTable.setDefaultEditor(Object.class, null);
 
+        // Обработчик двойного клика по строке таблицы
         itemsTable.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {

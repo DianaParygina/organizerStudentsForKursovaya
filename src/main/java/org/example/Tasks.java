@@ -25,40 +25,61 @@ class Tasks extends JFrame {
     private final TypeWorks parentTypeWorks; // Ссылка на родительское окно
 
     public Tasks(int TypeWorksId, int ItemsId, TypeWorks parentTypeWorks) {
-        this.TypeWorksId = TypeWorksId; // Сохраняем TypeWorksId
-        this.ItemsId = ItemsId;         // Сохраняем ItemsId
-        this.parentTypeWorks = parentTypeWorks; // Сохраняем ссылку на родительское окно
+        this.TypeWorksId = TypeWorksId;
+        this.ItemsId = ItemsId;
+        this.parentTypeWorks = parentTypeWorks;
 
-        tasksTableModel = new DefaultTableModel(new Object[]{"ID", "target", "hours", "dueDate", "elapsedTime", "done"}, 0) {
+        // Настройки шрифтов
+        Font headerFont = new Font("Arial", Font.BOLD, 16);
+        Font tableFont = new Font("Arial", Font.PLAIN, 14);
+
+        // Заголовок окна
+        setTitle("Список работ");
+
+        // Модель таблицы
+        tasksTableModel = new DefaultTableModel(new Object[]{"ID", "Задача", "Часы", "Срок", "Затрачено", "Готово"}, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
-                return column == 5; // Только столбец "done" редактируемый
+                return column == 5;
             }
 
             @Override
             public Class<?> getColumnClass(int columnIndex) {
                 if (columnIndex == 5) {
-                    return Boolean.class; // Тип данных столбца "done" - boolean
-                } else if (columnIndex == 3) {
-                    return String.class; // Тип данных столбца "dueDate" - String
-                } else if (columnIndex == 4) { // Тип данных столбца "elapsedTime" - String (формат HH:mm:ss)
+                    return Boolean.class;
+                } else if (columnIndex == 3 || columnIndex == 4) {
                     return String.class;
                 }
                 return super.getColumnClass(columnIndex);
             }
         };
         tasksTable = new JTable(tasksTableModel);
+        tasksTable.setFont(tableFont);
+        tasksTable.setRowHeight(25);
+
+        // Заголовок
+        JLabel headerLabel = new JLabel("Задачи", SwingConstants.CENTER);
+        headerLabel.setFont(headerFont);
+        headerLabel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+
+        // Панель для заголовка
+        JPanel headerPanel = new JPanel(new GridLayout(1, 1));
+        headerPanel.add(headerLabel);
+
+        // Скролл для таблицы
         JScrollPane scrollPane = new JScrollPane(tasksTable);
-        add(scrollPane);
-        setTitle("Список работ");
+
+        // Размещение элементов на окне
+        setLayout(new BorderLayout());
+        add(headerPanel, BorderLayout.NORTH);
+        add(scrollPane, BorderLayout.CENTER);
+
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        setSize(800, 200);
+        setSize(800, 280);
         setLocationRelativeTo(null);
         setVisible(true);
 
-        // Загрузка специальностей из БД
         loadSpecialtiesFromDatabase(TypeWorksId, ItemsId);
-
         tasksTable.setCellSelectionEnabled(false);
 
 
