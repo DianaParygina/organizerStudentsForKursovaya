@@ -49,6 +49,7 @@ class AdditionalTasks extends JFrame {
                 timer.cancel();
                 timer = null;
                 startTimer.setLabel("Запустить время"); // Возвращаем текст на кнопке
+                tasks.refreshTable();
             }
         });
 

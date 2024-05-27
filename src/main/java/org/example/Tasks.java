@@ -29,18 +29,20 @@ class Tasks extends JFrame {
         this.ItemsId = ItemsId;         // Сохраняем ItemsId
         this.parentTypeWorks = parentTypeWorks; // Сохраняем ссылку на родительское окно
 
-        tasksTableModel = new DefaultTableModel(new Object[]{"ID", "target", "hours", "dueDate", "done"}, 0) {
+        tasksTableModel = new DefaultTableModel(new Object[]{"ID", "target", "hours", "dueDate", "elapsedTime", "done"}, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
-                return column == 4; // Только столбец "done" редактируемый
+                return column == 5; // Только столбец "done" редактируемый
             }
 
             @Override
             public Class<?> getColumnClass(int columnIndex) {
-                if (columnIndex == 4) {
+                if (columnIndex == 5) {
                     return Boolean.class; // Тип данных столбца "done" - boolean
                 } else if (columnIndex == 3) {
                     return String.class; // Тип данных столбца "dueDate" - String
+                } else if (columnIndex == 4) { // Тип данных столбца "elapsedTime" - String (формат HH:mm:ss)
+                    return String.class;
                 }
                 return super.getColumnClass(columnIndex);
             }
@@ -65,7 +67,7 @@ class Tasks extends JFrame {
             // Обновление значения в базе данных
             int row = e.getFirstRow();
             int column = e.getColumn();
-            if (column == 4) { // Изменение в столбце "done"
+            if (column == 5) { // Изменение в столбце "done"
                 int id = (int) tasksTable.getValueAt(row, 0);
                 boolean done = (boolean) tasksTable.getValueAt(row, column);
                 try (Connection connection = DBConnector.connection();
@@ -116,11 +118,23 @@ class Tasks extends JFrame {
             @Override
             public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
                 Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-                if ((boolean) tasksTable.getValueAt(row, 4)) {
+
+                // Проверка на elapsedTime >= hours
+                String elapsedTimeString = (String) table.getValueAt(row, 4);
+                int hours = (int) table.getValueAt(row, 2);
+                if (elapsedTimeString != null && !elapsedTimeString.isEmpty()) {
+                    long elapsedSeconds = hhmmssToSeconds(elapsedTimeString);
+                    if (elapsedSeconds >= hours * 3600) {
+                        c.setBackground(Color.GREEN);
+                        return c; // Выходим, если условие выполнено
+                    }
+                }
+
+                // Если elapsedTime < hours, проверяем done и dueDate
+                if ((boolean) table.getValueAt(row, 5)) {
                     c.setBackground(Color.GREEN);
                 } else {
-                    // Проверяем dueDate и устанавливаем цвет строки
-                    String dueDateDateString = (String) tasksTable.getValueAt(row, 3);
+                    String dueDateDateString = (String) table.getValueAt(row, 3);
                     if (dueDateDateString != null && !dueDateDateString.isEmpty()) {
                         try {
                             Date dueDate = new SimpleDateFormat("yyyy-MM-dd").parse(dueDateDateString);
@@ -141,8 +155,6 @@ class Tasks extends JFrame {
                 return c;
             }
         });
-
-
     }
 
     public void refreshTable() {
@@ -169,9 +181,13 @@ class Tasks extends JFrame {
                 String target = resultSet.getString("target");
                 int hours = resultSet.getInt("hours");
                 boolean done = resultSet.getInt("done") == 1;
+                int elapsedTimeSeconds = resultSet.getInt("elapsedTime"); // Получение времени в секундах
                 String dueDate = resultSet.getString("dueDate");
 
-                tasksTableModel.addRow(new Object[]{id, target, hours, dueDate, done});
+                // Преобразование времени в формат HH:mm:ss
+                String elapsedTimeFormatted = formatSecondsToHHMMSS(elapsedTimeSeconds);
+
+                tasksTableModel.addRow(new Object[]{id, target, hours, dueDate, elapsedTimeFormatted, done});
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -179,10 +195,28 @@ class Tasks extends JFrame {
         }
     }
 
+    private String formatSecondsToHHMMSS(long timeInMillis) {
+        long seconds = timeInMillis / 1000;
+        long minutes = seconds / 60;
+        long hours = minutes / 60;
+        seconds %= 60;
+        minutes %= 60;
+        return String.format("%02d:%02d:%02d", hours, minutes, seconds);
+    }
+
     // Метод для обновления общего времени в родительском окне
     public void refreshParentTotalTime() {
         if (parentTypeWorks != null) {
             parentTypeWorks.updateTotalTime(ItemsId);
         }
+    }
+
+    // Функция для конвертации HH:mm:ss в секунды
+    private long hhmmssToSeconds(String hhmmss) {
+        String[] parts = hhmmss.split(":");
+        long hours = Long.parseLong(parts[0]);
+        long minutes = Long.parseLong(parts[1]);
+        long seconds = Long.parseLong(parts[2]);
+        return hours * 3600 + minutes * 60 + seconds;
     }
 }
