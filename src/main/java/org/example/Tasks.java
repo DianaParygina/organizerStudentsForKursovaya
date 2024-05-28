@@ -146,8 +146,12 @@ class Tasks extends JFrame {
                 if (elapsedTimeString != null && !elapsedTimeString.isEmpty()) {
                     long elapsedSeconds = hhmmssToSeconds(elapsedTimeString);
                     if (elapsedSeconds >= hours * 3600) {
-                        c.setBackground(Color.GREEN);
-                        return c; // Выходим, если условие выполнено
+                        if ((boolean) table.getValueAt(row, 5)) { // Проверяем значение "done" только если время превышено
+                            c.setBackground(Color.GREEN);
+                        } else {
+                            c.setBackground(Color.YELLOW);
+                        }
+                        return c; // Выходим после установки цвета
                     }
                 }
 
