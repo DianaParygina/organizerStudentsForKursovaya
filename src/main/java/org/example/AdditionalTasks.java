@@ -1,7 +1,6 @@
 package org.example;
 
 import db.DBConnector;
-
 import javax.swing.*;
 import java.awt.*;
 import java.sql.Connection;

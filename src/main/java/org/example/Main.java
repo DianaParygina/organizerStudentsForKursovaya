@@ -1,7 +1,6 @@
 package org.example;
 
 import db.DBConnector;
-
 import java.sql.SQLException;
 
 public class Main {
@@ -18,5 +17,4 @@ public class Main {
             e.printStackTrace();
         }
     }
-
 }
