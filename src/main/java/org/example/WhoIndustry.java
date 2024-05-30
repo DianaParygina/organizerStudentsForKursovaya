@@ -8,16 +8,15 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.sql.*;
 
-public class WhoIndustry extends JFrame {
+class WhoIndustry extends JFrame {
     private final JTable industryTable;
     private final DefaultTableModel industryTableModel;
     private int selectedIndustryId = -1;
 
-    public WhoIndustry() {
+    public WhoIndustry(String currentUsername) {
         // Настройки шрифтов
         Font headerFont = new Font("Arial", Font.BOLD, 16);
         Font tableFont = new Font("Arial", Font.PLAIN, 14);
-
         // Заголовок окна
         setTitle("Выбор отрасли");
 
@@ -62,7 +61,7 @@ public class WhoIndustry extends JFrame {
                     int selectedRow = industryTable.getSelectedRow();
                     if (selectedRow != -1) {
                         selectedIndustryId = (int) industryTable.getValueAt(selectedRow, 0);
-                        new SpecialtySelection(selectedIndustryId).setVisible(true);
+                        new SpecialtySelection(selectedIndustryId, currentUsername).setVisible(true);
                     }
                 }
             }
@@ -72,7 +71,6 @@ public class WhoIndustry extends JFrame {
     private void loadIndustriesFromDatabase() {
         try (Connection connection = DBConnector.connection();
              PreparedStatement preparedStatement = connection.prepareStatement("SELECT id, NameIndustry FROM who")) {
-
             ResultSet resultSet = preparedStatement.executeQuery();
             while (resultSet.next()) {
                 int id = resultSet.getInt("id");

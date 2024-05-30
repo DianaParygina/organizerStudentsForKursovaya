@@ -22,7 +22,6 @@ class Items extends JFrame {
         // Настройки шрифтов
         Font headerFont = new Font("Arial", Font.BOLD, 16);
         Font tableFont = new Font("Arial", Font.PLAIN, 14);
-
         // Заголовок окна
         setTitle("Список предметов");
 
@@ -74,6 +73,21 @@ class Items extends JFrame {
                 }
             }
         });
+
+        // Создаем панель для кнопки
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER)); // Размещение по центру
+
+        // Кнопка начала
+        JButton StartButton = new JButton("К отраслям");
+        StartButton.addActionListener(e -> {
+            new WhoIndustry("").setVisible(true);
+        });
+
+        // Добавляем кнопку на панель
+        buttonPanel.add(StartButton);
+
+        // Добавляем панель на окно
+        add(buttonPanel, BorderLayout.SOUTH); // Размещаем панель снизу
     }
 
     private void loadItemsFromDatabase(int itemsId) {

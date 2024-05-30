@@ -36,9 +36,14 @@ public class DBConnector {
 
     public static void createDB() throws SQLException {
         Statement statmt = conn.createStatement();
-        statmt.execute("CREATE TABLE if not exists 'Предметы' ('id' INTEGER PRIMARY KEY AUTOINCREMENT, 'name' text, 'number_of_hours' integer, 'idWho' INTEGER, 'idCourse' INTEGER,'idProgram' INTEGER, FOREIGN KEY (idWho) REFERENCES Who (id), FOREIGN KEY (idCourse) REFERENCES specialtyCourse (id), FOREIGN KEY (idProgram) REFERENCES EducationalProgram (id));");
-        statmt.execute("CREATE TABLE if not exists 'Работы' ('id' INTEGER PRIMARY KEY AUTOINCREMENT, 'type' text, 'target' text, 'due_date' string, 'done' boolean, 'elapsedTime' int, 'item_id' INTEGER, FOREIGN KEY (item_id) REFERENCES item (id));");
+        statmt.execute("CREATE TABLE if not exists 'Предметы' ('id' INTEGER PRIMARY KEY AUTOINCREMENT, 'name' TEXT, 'number_of_hours' integer, 'idType' INTEGER, FOREIGN KEY (idType) REFERENCES specialtyCourse (id));");
+        statmt.execute("CREATE TABLE if not exists 'Работы' ('id' INTEGER PRIMARY KEY AUTOINCREMENT, 'target' TEXT, 'hours' TEXT, 'done' boolean, 'elapsedTime' INTEGER, 'dueDate' TEXT, 'idItem' INTEGER, 'idType' INTEGER, FOREIGN KEY (idItem) REFERENCES Предметы (id), FOREIGN KEY (idType) REFERENCES Тип (id));");
         statmt.execute("CREATE TABLE if not exists 'Who' ('id' INTEGER PRIMARY KEY AUTOINCREMENT, 'NameIndustry' TEXT);");
+        statmt.execute("CREATE TABLE if not exists 'Тип' ('id' INTEGER PRIMARY KEY AUTOINCREMENT, 'nameType' text);");
+        statmt.execute("CREATE TABLE if not exists 'specialtyCourse' ('id' INTEGER PRIMARY KEY AUTOINCREMENT, 'type' text, 'nameCourse' text, 'idNameProgram' INTEGER, FOREIGN KEY (idNameProgram) REFERENCES EducationalProgram (id));");
+        statmt.execute("CREATE TABLE if not exists 'EducationalProgram' ('id' INTEGER PRIMARY KEY AUTOINCREMENT, 'NameProgram' TEXT, 'idNameIndustry' integer, FOREIGN KEY (idNameIndustry) REFERENCES Who (id));");
+        statmt.execute("CREATE TABLE if not exists 'Вход' ('id' INTEGER PRIMARY KEY AUTOINCREMENT, 'username' TEXT, 'password' TEXT, 'idNeed' INTEGER, FOREIGN KEY (idNeed) REFERENCES specialtyCourse (id));");
+        closeConnection();
     }
 
     // Метод для сохранения прошедшего времени в базу данных
@@ -65,82 +70,3 @@ public class DBConnector {
         return elapsedTime;
     }
 }
-
-
-
-//    public static List<Item> getAllItem() throws SQLException {
-//        Statement statement = conn.createStatement();
-//        List<Item> list = new ArrayList<Item>();
-//        ResultSet resultSet = statement.executeQuery("SELECT id, name, number_of_hours FROM item");
-//        while (resultSet.next()) {
-//            list.add(new Item(resultSet.getInt("id"),resultSet.getString("name"), resultSet.getString("number_of_hours")));
-//        }
-//        resultSet.close();
-//        statement.close();
-//        return list;
-//    }
-//
-//    public static List<Task> getTasksForItem(int itemId) throws SQLException {
-//        List<Task> tasks = new ArrayList<>();
-//        String sql = "SELECT * FROM tasks WHERE item_id = ?";
-//        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
-//            pstmt.setInt(1, itemId);
-//            ResultSet rs = pstmt.executeQuery();
-//            while (rs.next()) {
-//                int id = rs.getInt("id");
-//                String type = rs.getString("type");
-//                String target = rs.getString("target");
-//                String due_date = rs.getString("due_date");
-//                boolean done = rs.getBoolean("done");
-//                Task task = new Task(id, type, target, due_date, done);
-//                tasks.add(task);
-//            }
-//        }
-//        return tasks;
-//    }
-
-//    public static String searchStateByIdRepublic(int id, String type) {
-//        String sqlrepublic = "SELECT name, satisfaction_of_citizens, parliament FROM republic WHERE id = ?";
-//        try (PreparedStatement pstmt = connection().prepareStatement(sqlrepublic)) {
-//            pstmt.setInt(1, id);
-//            try (ResultSet rs = pstmt.executeQuery()) {
-//                if (rs.next()) {
-//                    String name = rs.getString("name");
-//                    String satisfactionOfCitizens = rs.getString("satisfaction_of_citizens");
-//                    String parliament = rs.getString("parliament");
-//                    closeConnection();
-//                    return String.format("Имя: %s.\nУдовлетворение граждан: %s.\nПарламент: %s.\n",
-//                            name, satisfactionOfCitizens, parliament);
-//                } else {
-//                    closeConnection();
-//                    return "Государство с таким ID не найдено.";
-//                }
-//            }
-//        } catch (SQLException e) {
-//            closeConnection();
-//            e.printStackTrace();
-//            return "Ошибка при выполнении запроса к базе данных.";
-//        }
-//    }
-//
-//
-//    public static String deleteRepublic(int id, String type) throws SQLException {
-//        String result = null;
-//        String sqlRepublic = "DELETE FROM republic WHERE id = ?";
-//        try (PreparedStatement pstmt = conn.prepareStatement(sqlRepublic)) {
-//            pstmt.setInt(1, id);
-//            int affectedRows = pstmt.executeUpdate();
-//            if (affectedRows > 0) {
-//                closeConnection();
-//                return "Удалено!";
-//            } else {
-//                closeConnection();
-//                return "Государство с таким ID не найдено.";
-//            }
-//        }  catch (SQLException e) {
-//            closeConnection();
-//            result = "Error deleting republic: " + e.getMessage();
-//            e.printStackTrace();
-//        }
-//        return result;
-//    }

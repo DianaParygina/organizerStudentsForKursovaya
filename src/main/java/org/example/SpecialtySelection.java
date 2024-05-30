@@ -16,11 +16,10 @@ class SpecialtySelection extends JFrame {
     private final DefaultTableModel specialtyTableModel;
     private int selectedSpecialty = -1;
 
-    public SpecialtySelection(int industryId) {
+    public SpecialtySelection(int industryId, String currentUsername) {
         // Настройки шрифтов
         Font headerFont = new Font("Arial", Font.BOLD, 16);
         Font tableFont = new Font("Arial", Font.PLAIN, 14);
-
         // Заголовок окна
         setTitle("Выбор специальности");
 
@@ -65,7 +64,7 @@ class SpecialtySelection extends JFrame {
                     int selectedRow = specialtyTable.getSelectedRow();
                     if (selectedRow != -1) {
                         selectedSpecialty = (int) specialtyTable.getValueAt(selectedRow, 0);
-                        new Course(selectedSpecialty).setVisible(true);
+                        new Course(selectedSpecialty, currentUsername).setVisible(true);
                     }
                 }
             }
@@ -75,7 +74,6 @@ class SpecialtySelection extends JFrame {
     private void loadSpecialtiesFromDatabase(int industryId) {
         try (Connection connection = DBConnector.connection();
              PreparedStatement preparedStatement = connection.prepareStatement("SELECT id, nameProgram FROM EducationalProgram WHERE idNameIndustry = ?")) {
-
             preparedStatement.setInt(1, industryId);
             ResultSet resultSet = preparedStatement.executeQuery();
             while (resultSet.next()) {
