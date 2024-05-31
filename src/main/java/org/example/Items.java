@@ -78,8 +78,16 @@ class Items extends JFrame {
             new WhoIndustry("").setVisible(true);
         });
 
+        // Кнопка выхода
+        JButton ExitButton = new JButton("Выйти");
+        ExitButton.addActionListener(e -> {
+            dispose();
+            new LogWindow().setVisible(true);
+        });
+
         // Добавляем кнопку на панель
         buttonPanel.add(StartButton);
+        buttonPanel.add(ExitButton);
 
         // Добавляем панель на окно
         add(buttonPanel, BorderLayout.SOUTH); // Размещаем панель снизу
