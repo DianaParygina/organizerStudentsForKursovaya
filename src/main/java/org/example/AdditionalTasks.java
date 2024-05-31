@@ -1,77 +1,77 @@
 package org.example;
 
-import db.DBConnector;
 import javax.swing.*;
 import java.awt.*;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.sql.SQLException;
 import java.util.Timer;
 import java.util.TimerTask;
 
 class AdditionalTasks extends JFrame {
-    private int selectedTask;
+    private final int selectedTask;
     private JLabel timerLabel;
     private Timer timer;
     private long startTime;
-    private long elapsedTime = 0; // Переменная для хранения прошедшего времени
-    private Button startTimer; // Сделаем кнопку доступной для изменения
-    private Tasks tasks; // Ссылка на родительское окно Tasks
+    private long elapsedTime = 0;
+    private Button startTimer;
+    private final Tasks tasks;
 
     public AdditionalTasks(int selectedTasks, Tasks tasks) {
         this.selectedTask = selectedTasks;
-        this.tasks = tasks; // Сохраняем ссылку на родительское окно
+        this.tasks = tasks;
 
         setTitle("Моя работа");
         setSize(400, 200);
 
-        // Кнопка запуска таймера
         startTimer = new Button("Запустить время");
         startTimer.addActionListener(e -> {
             if (timer == null) {
-                // Запуск таймера
                 startTime = System.currentTimeMillis();
                 timer = new Timer();
                 timer.schedule(new TimerTask() {
                     @Override
                     public void run() {
-                        elapsedTime += System.currentTimeMillis() - startTime; // Добавляем прошедшее время
-                        startTime = System.currentTimeMillis(); // Обновляем начальное время
-                        timerLabel.setText(formatTime(elapsedTime));
-                        // Сохраняем текущее время в базе данных
-                        saveElapsedTimeToDatabase();
+                        elapsedTime += System.currentTimeMillis() - startTime;
+                        startTime = System.currentTimeMillis();
+                        timerLabel.setText(Methods.formatTime(elapsedTime));
+                        try {
+                            Methods.saveElapsedTimeToDatabase(selectedTask, elapsedTime);
+                        } catch (SQLException ex) {
+                            throw new RuntimeException(ex);
+                        }
+                        tasks.refreshTable();
                     }
-                }, 0, 1000); // Обновление каждые 1000 миллисекунд (1 секунда)
-                startTimer.setLabel("Остановить время"); // Меняем текст на кнопке
+                }, 0, 1000);
+                startTimer.setLabel("Остановить время");
             } else {
-                // Остановка таймера
                 timer.cancel();
                 timer = null;
-                startTimer.setLabel("Запустить время"); // Возвращаем текст на кнопке
+                startTimer.setLabel("Запустить время");
                 tasks.refreshTable();
             }
         });
 
-        // Кнопка редактирования задачи
         Button editTasks = new Button("Редактировать работу");
         editTasks.addActionListener(e -> showEditDialog());
 
-        // Кнопка удаления задачи
         Button deleteTasks = new Button("Удалить работу");
         deleteTasks.addActionListener(e -> {
-            deleteTask(selectedTask);
+            Methods.deleteTask(selectedTask);
             tasks.refreshTable();
             dispose();
         });
 
-        // Метка для отображения таймера
-        timerLabel = new JLabel("00:00:00"); // Инициализируй timerLabel
+        timerLabel = new JLabel("00:00:00");
         timerLabel.setFont(new Font("Arial", Font.BOLD, 20));
 
-        // Загружаем прошедшее время из базы данных при запуске
-        loadElapsedTimeFromDatabase();
+        try {
+            elapsedTime = Methods.loadElapsedTimeFromDatabase(selectedTask);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        timerLabel.setText(Methods.formatTime(elapsedTime));
 
-        // Панель с кнопками и меткой
         Panel panel = new Panel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         panel.add(timerLabel);
@@ -87,59 +87,19 @@ class AdditionalTasks extends JFrame {
         setLocationRelativeTo(null);
         setVisible(true);
 
-        // Закрытие окна:
-        addWindowListener(new java.awt.event.WindowAdapter() {
+        addWindowListener(new WindowAdapter() {
             @Override
-            public void windowClosing(java.awt.event.WindowEvent windowEvent) {
-                // Сохраняем прошедшее время в базе данных перед закрытием окна
-                saveElapsedTimeToDatabase();
+            public void windowClosing(WindowEvent windowEvent) {
+                try {
+                    Methods.saveElapsedTimeToDatabase(selectedTask, elapsedTime);
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                }
             }
         });
     }
 
-    // Добавление слушателя на нажатие кнопки редактирования
     private void showEditDialog() {
         new showEditDialog(selectedTask, tasks);
-    }
-
-    private void deleteTask(int taskId) {
-        try (Connection connection = DBConnector.connection();
-             PreparedStatement preparedStatement = connection.prepareStatement("DELETE FROM Работы WHERE id = ?")) {
-            preparedStatement.setInt(1, taskId);
-            preparedStatement.executeUpdate();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
-    // Форматирование времени
-    private String formatTime(long timeInMillis) {
-        long seconds = timeInMillis / 1000;
-        long minutes = seconds / 60;
-        long hours = minutes / 60;
-        seconds %= 60;
-        minutes %= 60;
-        return String.format("%02d:%02d:%02d", hours, minutes, seconds);
-    }
-
-    private void loadElapsedTimeFromDatabase() {
-        try {
-            elapsedTime = DBConnector.loadElapsedTimeFromDatabase(selectedTask);
-            // Обновляем текст метки таймера
-            timerLabel.setText(formatTime(elapsedTime));
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
-    // Метод для сохранения прошедшего времени в базе данных
-    private void saveElapsedTimeToDatabase() {
-        try {
-            DBConnector.saveElapsedTimeToDatabase(selectedTask, elapsedTime);
-            // Обновляем общее время в родительском окне
-            tasks.refreshParentTotalTime();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
     }
 }

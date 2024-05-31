@@ -1,16 +1,10 @@
 package org.example;
 
-import db.DBConnector;
-
 import javax.swing.*;
 import java.awt.*;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 
 class LogWindow extends JFrame {
-
     private JTextField usernameField;
     private JPasswordField passwordField;
 
@@ -39,13 +33,12 @@ class LogWindow extends JFrame {
             String password = new String(passwordField.getPassword());
 
             try {
-                if (authenticateUser(username, password)) {
-                    int idNeed = getIdNeed(username);
+                if (Methods.authenticateUser(username, password)) {
+                    int idNeed = Methods.getIdNeed(username);
                     if (idNeed != -1) {
                         dispose();
                         new Items(idNeed).setVisible(true);
                     } else {
-                        // Если idNeed не найден, то открываем окно выбора
                         dispose();
                         new WhoIndustry(username).setVisible(true);
                     }
@@ -75,30 +68,5 @@ class LogWindow extends JFrame {
         setSize(300, 150);
         setLocationRelativeTo(null);
         setVisible(true);
-    }
-
-    // Метод для проверки логина и пароля
-    private boolean authenticateUser(String username, String password) throws SQLException {
-        try (Connection connection = DBConnector.connection();
-             PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM вход WHERE username = ? AND password = ?")) {
-            preparedStatement.setString(1, username);
-            preparedStatement.setString(2, password);
-            ResultSet resultSet = preparedStatement.executeQuery();
-            return resultSet.next();
-        }
-    }
-
-    // Метод для получения idNeed из базы данных по имени пользователя
-    private int getIdNeed(String username) throws SQLException {
-        int idNeed = -1;
-        try (Connection connection = DBConnector.connection();
-             PreparedStatement preparedStatement = connection.prepareStatement("SELECT idNeed FROM вход WHERE username = ?")) {
-            preparedStatement.setString(1, username);
-            ResultSet resultSet = preparedStatement.executeQuery();
-            if (resultSet.next()) {
-                idNeed = resultSet.getInt("idNeed");
-            }
-        }
-        return idNeed;
     }
 }

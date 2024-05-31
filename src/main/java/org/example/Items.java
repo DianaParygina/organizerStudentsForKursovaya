@@ -1,15 +1,10 @@
 package org.example;
 
-import db.DBConnector;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 
 class Items extends JFrame {
     private final JTable itemsTable;
@@ -54,7 +49,7 @@ class Items extends JFrame {
         setVisible(true);
 
         // Загрузка данных
-        loadItemsFromDatabase(itemsId);
+        Methods.loadItemsFromDatabase(itemsTableModel, itemsId);
         itemsTable.setCellSelectionEnabled(false);
         itemsTable.setDefaultEditor(Object.class, null);
 
@@ -88,22 +83,5 @@ class Items extends JFrame {
 
         // Добавляем панель на окно
         add(buttonPanel, BorderLayout.SOUTH); // Размещаем панель снизу
-    }
-
-    private void loadItemsFromDatabase(int itemsId) {
-        try (Connection connection = DBConnector.connection();
-             PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM Предметы WHERE idType = ?")) {
-            preparedStatement.setInt(1, itemsId);
-            ResultSet resultSet = preparedStatement.executeQuery();
-            while (resultSet.next()) {
-                int id = resultSet.getInt("id");
-                String name = resultSet.getString("name");
-                int numberOfHours = resultSet.getInt("number_of_hours");
-                itemsTableModel.addRow(new Object[]{id, name, numberOfHours});
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-            JOptionPane.showMessageDialog(this, "Ошибка при получении данных из базы данных.", "Ошибка", JOptionPane.ERROR_MESSAGE);
-        }
     }
 }

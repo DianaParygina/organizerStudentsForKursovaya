@@ -1,14 +1,10 @@
 package org.example;
 
-import db.DBConnector;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 
 class Course extends JFrame {
@@ -52,7 +48,7 @@ class Course extends JFrame {
         setVisible(true);
 
         // Загрузка данных
-        loadSpecialtiesFromDatabase(courseId);
+        Methods.loadCourseFromDatabase(courseTableModel, courseId);
         courseTable.setCellSelectionEnabled(false);
         courseTable.setDefaultEditor(Object.class, null);
 
@@ -66,7 +62,7 @@ class Course extends JFrame {
                         selectedCourse = (int) courseTable.getValueAt(selectedRow, 0);
                         // Сохраняем id курса в базу данных, связав его с пользователем
                         try {
-                            saveCourseIdToDatabase(selectedCourse, currentUsername);
+                            Methods.saveCourseIdToDatabase(selectedCourse, currentUsername);
                             new Items(selectedCourse).setVisible(true);
                         } catch (SQLException ex) {
                             ex.printStackTrace();
@@ -76,31 +72,5 @@ class Course extends JFrame {
                 }
             }
         });
-    }
-
-    private void loadSpecialtiesFromDatabase(int courseId) {
-        try (Connection connection = DBConnector.connection();
-             PreparedStatement preparedStatement = connection.prepareStatement("SELECT id, nameCourse FROM specialtyCourse WHERE idNameProgram = ?")) {
-            preparedStatement.setInt(1, courseId);
-            ResultSet resultSet = preparedStatement.executeQuery();
-            while (resultSet.next()) {
-                int id = resultSet.getInt("id");
-                String nameCourse = resultSet.getString("nameCourse");
-                courseTableModel.addRow(new Object[]{id, nameCourse});
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-            JOptionPane.showMessageDialog(this, "Ошибка при получении данных из базы данных.", "Ошибка", JOptionPane.ERROR_MESSAGE);
-        }
-    }
-
-    // Метод для сохранения id курса в базу данных
-    private void saveCourseIdToDatabase(int courseId, String currentUsername) throws SQLException {
-        try (Connection connection = DBConnector.connection();
-             PreparedStatement preparedStatement = connection.prepareStatement("UPDATE вход SET idNeed = ? WHERE username = ?")) {
-            preparedStatement.setInt(1, courseId);
-            preparedStatement.setString(2, currentUsername);
-            preparedStatement.executeUpdate();
-        }
     }
 }

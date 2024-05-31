@@ -49,7 +49,7 @@ class WhoIndustry extends JFrame {
         setVisible(true);
 
         // Загрузка данных
-        loadIndustriesFromDatabase();
+        Methods.loadIndustriesFromDatabase(industryTableModel);
         industryTable.setCellSelectionEnabled(false);
         industryTable.setDefaultEditor(Object.class, null);
 
@@ -66,20 +66,5 @@ class WhoIndustry extends JFrame {
                 }
             }
         });
-    }
-
-    private void loadIndustriesFromDatabase() {
-        try (Connection connection = DBConnector.connection();
-             PreparedStatement preparedStatement = connection.prepareStatement("SELECT id, NameIndustry FROM who")) {
-            ResultSet resultSet = preparedStatement.executeQuery();
-            while (resultSet.next()) {
-                int id = resultSet.getInt("id");
-                String nameIndustry = resultSet.getString("NameIndustry");
-                industryTableModel.addRow(new Object[]{id, nameIndustry});
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-            JOptionPane.showMessageDialog(this, "Ошибка при получении данных из базы данных.", "Ошибка", JOptionPane.ERROR_MESSAGE);
-        }
     }
 }
